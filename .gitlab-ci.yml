@@ -1,0 +1,87 @@
+stages:
+  - Unit test
+  - Build binaries
+  - Release
+
+variables:
+  GO_VERSION: 1.21.3
+  PACKAGE_REGISTRY_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/releases
+
+default:
+  interruptible: true
+
+workflow:
+  rules:
+    # Block MR pipelines
+    - if: $CI_PIPELINE_SOURCE != 'merge_request_event'
+
+.golang:
+  image: golang:$GO_VERSION
+  variables:
+    GOCACHE: $CI_PROJECT_DIR/.gocache
+    CGO_ENABLED: 0
+  before_script:
+    - mkdir -p $CI_PROJECT_DIR/.gocache $CI_PROJECT_DIR/bin
+  cache:
+    paths:
+      - $CI_PROJECT_DIR/.gocache
+    key: "${CI_JOB_NAME_SLUG}"
+
+Run unit tests:
+  stage: Unit test
+  extends: .golang
+  needs: []
+  script:
+    - go test -v ./...
+
+Build binary:
+  stage: Build binaries
+  extends: .golang
+  needs: []
+  parallel:
+    matrix:
+      - GOOS: linux
+        GOARCH: ["amd64", "arm"]
+  script:
+    - export VERSION=${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}
+    - go build
+      -a -ldflags "-X main.VERSION=${VERSION} -w -extldflags '-static'"
+      -o ./bin/fleeting-plugin-proxmox-${GOOS}-${GOARCH}
+      ./cmd/fleeting-plugin-proxmox
+  artifacts:
+    expire_in: 4 hours
+    paths:
+      - bin/fleeting-plugin-proxmox-${GOOS}-${GOARCH}
+
+Upload binaries:
+  stage: Release
+  interruptible: false
+  image: alpine:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - apk add curl
+  script:
+    - ls bin > manifest.txt
+    - |
+      while read -r FILE; do
+        curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "./bin/${FILE}" "${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/${FILE}";
+      done < manifest.txt
+  artifacts:
+    expire_in: 4 hours
+    paths: ["manifest.txt"]
+
+Release:
+  stage: Release
+  needs: ["Upload binaries"]
+  interruptible: false
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - ASSET_LINKS=""
+    - |
+      while read -r FILE; do
+        ASSET_LINKS="${ASSET_LINKS} --assets-link '{\"name\":\"${FILE}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${CI_COMMIT_TAG}/${FILE}\", \"filepath\":\"/${FILE}\"}'";
+      done < manifest.txt
+    - /bin/sh -c "release-cli create --name ${CI_COMMIT_TAG} --tag-name ${CI_COMMIT_TAG} ${ASSET_LINKS}"
