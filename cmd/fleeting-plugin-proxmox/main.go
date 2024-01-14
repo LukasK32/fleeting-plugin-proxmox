@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	proxmox "gitlab.com/LukasK32/fleeting-plugin-proxmox/cmd/fleeting-plugin-proxmox/plugin"
+	"gitlab.com/gitlab-org/fleeting/fleeting/plugin"
 )
 
 // Injected during CI build
@@ -22,5 +25,5 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("Hello World!")
+	plugin.Serve(&proxmox.InstanceGroup{})
 }
