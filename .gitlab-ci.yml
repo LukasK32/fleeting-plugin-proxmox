@@ -1,4 +1,5 @@
 stages:
+  - Lint
   - Unit test
   - Build binaries
   - Release
@@ -26,6 +27,17 @@ workflow:
     paths:
       - $CI_PROJECT_DIR/.gocache
     key: "${CI_JOB_NAME_SLUG}"
+
+Lint:
+  stage: Lint
+  image: golangci/golangci-lint:v1.55.2
+  needs: []
+  rules:
+    - if: $CI_COMMIT_TAG == null
+  allow_failure: true # TODO: Remove once plugin is fully implemented
+  script:
+    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+    - golangci-lint run -v
 
 Run unit tests:
   stage: Unit test

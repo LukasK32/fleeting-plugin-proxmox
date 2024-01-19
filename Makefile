@@ -9,6 +9,10 @@ MAKEFLAGS += --no-builtin-rules
 all: test build
 .PHONY: all
 
+lint:
+	@golangci-lint run -v
+PHONY: lint
+
 vendor: go.mod go.sum
 	@go mod vendor
 
