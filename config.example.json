@@ -1,0 +1,18 @@
+{
+    "plugin_settings": {
+        "url": "",
+        "credentials_file_path": "/.../credentials.json",
+        "pool": "",
+        "storage": "",
+        "template_id": -1,
+        "max_instances": 5
+    },
+    "connector_config": {
+        "os": "linux",
+        "arch": "amd64",
+        "protocol": "ssh",
+        "username": "",
+        "password": "",
+        "use_static_credentials": true
+    }
+}

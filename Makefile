@@ -27,6 +27,12 @@ bin/fleeting-plugin-proxmox: vendor $(shell find cmd -name *.go)
 	@mkdir -p $(shell dirname $@)
 	@go build -a -ldflags "-w -extldflags '-static'" -o $@ ./cmd/fleeting-plugin-proxmox
 
+integration-test: bin/fleeting-plugin-proxmox
+	@go test -v $(shell go list ./test/integration) \
+		-plugin-binary-path="$(PWD)/bin/fleeting-plugin-proxmox" \
+		-config-path="$(PWD)/config.json"
+.PHONY: integration-test
+
 clean:
 	@rm -rf vendor bin
 .PHONY: clean

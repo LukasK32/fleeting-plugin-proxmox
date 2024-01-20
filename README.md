@@ -46,3 +46,19 @@ After creating a **DEDICATED** user, pool and storage follow procedure below to 
     * `PVESDNAdmin`.
 5. Add following role for the user to the node with the storage, network, template etc.:
     * `PVEAuditor` without propagation.
+
+## Development
+### Integration tests
+
+1. Create and fill out `credentials.json` file in project root (see [Credentials file](#credentials-file) for details)
+    ```bash
+    cp credentials.example.json credentials.json
+    ```
+2. Create and fill out `config.json` file in project root (see [Plugin settings](#plugin-settings) for details)
+    ```bash
+    cp config.example.json config.json
+    ```
+3. Run integration tests:
+    ```bash
+    make integration-test
+    ```
