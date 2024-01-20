@@ -25,5 +25,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	plugin.Serve(&proxmox.InstanceGroup{})
+	plugin.Serve(&proxmox.InstanceGroup{
+		Version: VERSION,
+	})
 }
