@@ -34,7 +34,6 @@ Lint:
   needs: []
   rules:
     - if: $CI_COMMIT_TAG == null
-  allow_failure: true # TODO: Remove once plugin is fully implemented
   script:
     - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
     - golangci-lint run -v
