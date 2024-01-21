@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -16,17 +17,10 @@ const (
 	proxmoxAgentStartTimeout = 2 * time.Minute
 )
 
+var ErrCloneVMWithoutConfiguredStorage = errors.New("attempted to clone a VM without configured storage")
+
 func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.VirtualMachine, cloneMu *sync.Mutex) (int, error) {
-	cloneMu.Lock()
-	VMID, task, err := template.Clone(
-		ctx,
-		&proxmox.VirtualMachineCloneOptions{
-			Name:    ig.PluginSettings.InstanceNameCreating,
-			Pool:    ig.PluginSettings.Pool,
-			Storage: ig.PluginSettings.Storage,
-		},
-	)
-	cloneMu.Unlock()
+	VMID, task, err := ig.cloneTemplate(ctx, template, cloneMu)
 
 	if err == nil {
 		ig.log.Info("Deploying new instance", "vmid", VMID)
@@ -35,7 +29,7 @@ func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.V
 	}
 
 	if err != nil {
-		return VMID, fmt.Errorf("failed to clone template: %w", err)
+		return VMID, fmt.Errorf("failed to deploy instance: %w", err)
 	}
 
 	vm, err := ig.getProxmoxVM(ctx, VMID)
@@ -52,12 +46,12 @@ func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.V
 		}
 
 		if err != nil {
-			return fmt.Errorf("failed to start instance: %w", err)
+			return fmt.Errorf("failed to start newly deployed instance: %w", err)
 		}
 
 		// Wait for agent to start
 		if err := vm.WaitForAgent(ctx, int(proxmoxAgentStartTimeout/time.Second)); err != nil {
-			return fmt.Errorf("failed when waiting for qemu agent to start: %w", err)
+			return fmt.Errorf("failed when waiting for qemu agent to start on newly deployed instance: %w", err)
 		}
 
 		return nil
@@ -84,6 +78,42 @@ func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.V
 	}
 
 	return VMID, nil
+}
+
+func (ig *InstanceGroup) cloneTemplate(ctx context.Context, template *proxmox.VirtualMachine, cloneMu *sync.Mutex) (int, *proxmox.Task, error) {
+	cloneOptions, err := ig.getTemplateCloneOptions(template)
+	if err != nil {
+		return -1, nil, err
+	}
+
+	cloneMu.Lock()
+	defer cloneMu.Unlock()
+
+	VMID, task, err := template.Clone(ctx, cloneOptions)
+	if err != nil {
+		return -1, nil, fmt.Errorf("failed to clone the template: %w", err)
+	}
+
+	return VMID, task, nil
+}
+
+func (ig *InstanceGroup) getTemplateCloneOptions(template *proxmox.VirtualMachine) (*proxmox.VirtualMachineCloneOptions, error) {
+	cloneOptions := &proxmox.VirtualMachineCloneOptions{
+		Name:    ig.PluginSettings.InstanceNameCreating,
+		Pool:    ig.PluginSettings.Pool,
+		Storage: ig.PluginSettings.Storage,
+		Full:    1,
+	}
+
+	if !template.Template && ig.PluginSettings.Storage == "" {
+		return nil, ErrCloneVMWithoutConfiguredStorage
+	}
+
+	if template.Template && ig.PluginSettings.Storage == "" {
+		cloneOptions.Full = 0
+	}
+
+	return cloneOptions, nil
 }
 
 func (ig *InstanceGroup) markStaleInstancesForRemoval(ctx context.Context) error {

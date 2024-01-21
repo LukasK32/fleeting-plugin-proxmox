@@ -83,10 +83,6 @@ func (s *Settings) CheckRequiredFields() error {
 		return fmt.Errorf("%w: pool", ErrRequiredSettingMissing)
 	}
 
-	if s.Storage == "" {
-		return fmt.Errorf("%w: storage", ErrRequiredSettingMissing)
-	}
-
 	if s.TemplateID == nil {
 		return fmt.Errorf("%w: template_id", ErrRequiredSettingMissing)
 	}

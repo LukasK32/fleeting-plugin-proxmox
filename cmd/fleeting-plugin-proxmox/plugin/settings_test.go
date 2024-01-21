@@ -91,7 +91,7 @@ func TestSettings_checkRequiredFields(t *testing.T) {
 				TemplateID:          &sampleTemplateID,
 				MaxInstances:        &sampleMaxInstances,
 			},
-			expectedError: ErrRequiredSettingMissing,
+			expectedError: nil,
 		},
 		{
 			name: "Missing template id",
