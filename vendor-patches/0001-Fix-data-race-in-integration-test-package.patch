@@ -1,0 +1,43 @@
+From 3b678ba231d758722600e1d1e04b063fbb43330a Mon Sep 17 00:00:00 2001
+From: Lukas Kirylak <contact@lukask.pro>
+Date: Sun, 21 Jan 2024 21:39:41 +0000
+Subject: [PATCH] Fix data race in integration test package
+
+---
+ vendor/gitlab.com/gitlab-org/fleeting/fleeting/integration/integration.go | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/vendor/gitlab.com/gitlab-org/fleeting/fleeting/integration/integration.go b/vendor/gitlab.com/gitlab-org/fleeting/fleeting/integration/integration.go
+index de520e8..0c4c18d 100644
+--- a/vendor/gitlab.com/gitlab-org/fleeting/fleeting/integration/integration.go
++++ b/vendor/gitlab.com/gitlab-org/fleeting/fleeting/integration/integration.go
+@@ -182,12 +182,14 @@ func executeCommand(t *testing.T, provisioner *fleeting.Provisioner, useExternal
+ 
+ 		t.Logf("connecting: %v, %v, %v", instance.ID(), info.Username, info.ExternalAddr)
+ 
+-		buf := new(bytes.Buffer)
++		stdoutBuf := new(bytes.Buffer)
++		stderrBuf := new(bytes.Buffer)
++
+ 		err = connector.Run(context.Background(), info, connector.ConnectorOptions{
+ 			RunOptions: connector.RunOptions{
+ 				Command: "echo 'hello world'",
+-				Stdout:  buf,
+-				Stderr:  buf,
++				Stdout:  stdoutBuf,
++				Stderr:  stderrBuf,
+ 			},
+ 			DialOptions: connector.DialOptions{
+ 				UseExternalAddr: useExternalAddr,
+@@ -195,6 +197,7 @@ func executeCommand(t *testing.T, provisioner *fleeting.Provisioner, useExternal
+ 		})
+ 
+ 		assert.NoError(t, err)
+-		assert.Contains(t, buf.String(), "hello world")
++		assert.Contains(t, stdoutBuf.String(), "hello world")
++		assert.Equal(t, stderrBuf.String(), "")
+ 	}
+ }
+-- 
+2.34.1
+

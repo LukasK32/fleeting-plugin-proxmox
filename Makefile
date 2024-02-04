@@ -13,8 +13,9 @@ lint:
 	@golangci-lint run -v
 PHONY: lint
 
-vendor: go.mod go.sum
+vendor: go.mod go.sum $(shell find vendor-patches -name *.patch)
 	@go mod vendor
+	@git apply $(PWD)/vendor-patches/*
 
 test: vendor
 	@go test -v ./...
