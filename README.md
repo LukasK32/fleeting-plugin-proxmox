@@ -2,6 +2,10 @@
 
 This is a [fleeting](https://gitlab.com/gitlab-org/fleeting/fleeting) plugin for [Proxmox Virtual Environment](https://www.proxmox.com/en/proxmox-virtual-environment/overview).
 
+## Installation
+
+See [Releases](https://github.com/LukasK32/fleeting-plugin-proxmox/releases) for available versions and installation instructions.
+
 ## Configuration
 ### Plugin settings
 
