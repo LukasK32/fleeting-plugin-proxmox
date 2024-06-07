@@ -1,6 +1,6 @@
 module github.com/lukask32/fleeting-plugin-proxmox
 
-go 1.21.3
+go 1.22.3
 
 require (
 	github.com/hashicorp/go-hclog v1.6.3
