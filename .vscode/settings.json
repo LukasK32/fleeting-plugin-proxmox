@@ -1,9 +1,12 @@
 {
     "go.lintTool": "golangci-lint",
     "go.lintFlags": [
-        "--fast"
+        "--fast",
     ],
     "gopls": {
         "formatting.gofumpt": true,
-    }
+    },
+    "go.alternateTools": {
+        "golangci-lint": "${workspaceFolder}/tools/golangci-lint",
+    },
 }
