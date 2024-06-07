@@ -1,4 +1,4 @@
-module gitlab.com/LukasK32/fleeting-plugin-proxmox
+module github.com/lukask32/fleeting-plugin-proxmox
 
 go 1.21.3
 

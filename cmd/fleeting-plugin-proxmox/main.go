@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	proxmox "gitlab.com/LukasK32/fleeting-plugin-proxmox/cmd/fleeting-plugin-proxmox/plugin"
+	proxmox "github.com/lukask32/fleeting-plugin-proxmox/cmd/fleeting-plugin-proxmox/plugin"
 	"gitlab.com/gitlab-org/fleeting/fleeting/plugin"
 )
 
