@@ -22,8 +22,6 @@ const triggerChannelCapacity = 100
 var ErrNoIPv4Address = errors.New("failed to determine IPv4 address for instance")
 
 type InstanceGroup struct {
-	Version string `json:"-"`
-
 	PluginSettings   Settings          `json:",inline"`
 	FleetingSettings provider.Settings `json:"-"`
 
@@ -82,7 +80,6 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 
 	return provider.ProviderInfo{
 		ID:      ig.PluginSettings.Pool,
-		Version: ig.Version,
 		MaxSize: *ig.PluginSettings.MaxInstances,
 	}, nil
 }
