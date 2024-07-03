@@ -11,7 +11,7 @@ import (
 func TestInstanceGroup_getProxmoxClient(t *testing.T) {
 	tempDir := t.TempDir()
 	ig := InstanceGroup{
-		PluginSettings: Settings{
+		Settings: Settings{
 			URL:                   "https://example.com/proxmox",
 			InsecureSkipTLSVerify: false,
 			CredentialsFilePath:   path.Join(tempDir, "prox_credentials.json"),
@@ -19,7 +19,7 @@ func TestInstanceGroup_getProxmoxClient(t *testing.T) {
 	}
 
 	err := os.WriteFile(
-		ig.PluginSettings.CredentialsFilePath,
+		ig.Settings.CredentialsFilePath,
 		[]byte(`{"realm": "pve","username": "03Ewl6rENi","password": "-rx£N503o_8(%\"l+=*4,YD"}`),
 		0o600,
 	)
@@ -32,7 +32,7 @@ func TestInstanceGroup_getProxmoxClient(t *testing.T) {
 func TestInstanceGroup_getProxmoxCredentials(t *testing.T) {
 	tempDir := t.TempDir()
 	ig := InstanceGroup{
-		PluginSettings: Settings{
+		Settings: Settings{
 			CredentialsFilePath: path.Join(tempDir, "sample_credentials.json"),
 		},
 	}
@@ -43,7 +43,7 @@ func TestInstanceGroup_getProxmoxCredentials(t *testing.T) {
 
 	// Malformed credentials file
 	err = os.WriteFile(
-		ig.PluginSettings.CredentialsFilePath,
+		ig.Settings.CredentialsFilePath,
 		[]byte(`{"realm": 'pve',`),
 		0o600,
 	)
@@ -54,7 +54,7 @@ func TestInstanceGroup_getProxmoxCredentials(t *testing.T) {
 
 	// Correct credentials file
 	err = os.WriteFile(
-		ig.PluginSettings.CredentialsFilePath,
+		ig.Settings.CredentialsFilePath,
 		[]byte(`{"realm": "pve","username": "oQcW8N246FODI6Qui","password": "88u3[kKLJ{gU7A£fhWq"}`),
 		0o600,
 	)

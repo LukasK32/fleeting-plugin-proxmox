@@ -53,7 +53,7 @@ func TestInstanceGroup_templateCloneOptions(t *testing.T) {
 			}
 
 			ig := InstanceGroup{
-				PluginSettings: Settings{
+				Settings: Settings{
 					Storage: testCase.configuredStorage,
 				},
 			}
