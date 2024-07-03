@@ -22,7 +22,7 @@ const triggerChannelCapacity = 100
 var ErrNoIPv4Address = errors.New("failed to determine IPv4 address for instance")
 
 type InstanceGroup struct {
-	PluginSettings   Settings          `json:",inline"`
+	Settings         `json:",inline"`
 	FleetingSettings provider.Settings `json:"-"`
 
 	log     hclog.Logger    `json:"-"`
@@ -52,13 +52,13 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 	ig.instanceCollectionTrigger = make(chan struct{}, triggerChannelCapacity)
 	ig.collectorShutdownTrigger = make(chan struct{}, 1)
 
-	if err := ig.PluginSettings.CheckRequiredFields(); err != nil {
+	if err := ig.Settings.CheckRequiredFields(); err != nil {
 		return provider.ProviderInfo{}, err
 	}
 
-	ig.PluginSettings.FillWithDefaults()
+	ig.Settings.FillWithDefaults()
 
-	if ig.PluginSettings.InsecureSkipTLSVerify {
+	if ig.Settings.InsecureSkipTLSVerify {
 		ig.log.Warn("TLS verification for Proxmox client is disabled, connections will be insecure")
 	}
 
@@ -79,8 +79,8 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 	ig.startRemovedInstanceCollector()
 
 	return provider.ProviderInfo{
-		ID:      ig.PluginSettings.Pool,
-		MaxSize: *ig.PluginSettings.MaxInstances,
+		ID:      ig.Settings.Pool,
+		MaxSize: *ig.Settings.MaxInstances,
 	}, nil
 }
 
@@ -94,9 +94,9 @@ func (ig *InstanceGroup) Shutdown(_ context.Context) error {
 
 // Increase implements provider.InstanceGroup.
 func (ig *InstanceGroup) Increase(ctx context.Context, count int) (int, error) {
-	template, err := ig.getProxmoxVM(ctx, *ig.PluginSettings.TemplateID)
+	template, err := ig.getProxmoxVM(ctx, *ig.Settings.TemplateID)
 	if err != nil {
-		return 0, fmt.Errorf("failed to find template with id='%d': %w", *ig.PluginSettings.TemplateID, err)
+		return 0, fmt.Errorf("failed to find template with id='%d': %w", *ig.Settings.TemplateID, err)
 	}
 
 	var (
@@ -153,11 +153,11 @@ func (ig *InstanceGroup) Update(ctx context.Context, update func(instance string
 		var state provider.State
 
 		switch member.Name {
-		case ig.PluginSettings.InstanceNameCreating:
+		case ig.Settings.InstanceNameCreating:
 			state = provider.StateCreating
-		case ig.PluginSettings.InstanceNameRunning:
+		case ig.Settings.InstanceNameRunning:
 			state = provider.StateRunning
-		case ig.PluginSettings.InstanceNameRemoving:
+		case ig.Settings.InstanceNameRemoving:
 			state = provider.StateDeleting
 		default:
 			continue // Unknown name, skipping...
@@ -187,7 +187,7 @@ func (ig *InstanceGroup) ConnectInfo(ctx context.Context, instance string) (prov
 	}
 
 	for _, networkInterface := range networkInterfaces {
-		if networkInterface.Name != ig.PluginSettings.InstanceNetworkInterface {
+		if networkInterface.Name != ig.Settings.InstanceNetworkInterface {
 			continue
 		}
 
@@ -233,12 +233,12 @@ func (ig *InstanceGroup) Decrease(ctx context.Context, instancesToRemove []strin
 			continue
 		}
 
-		if member.Name == ig.PluginSettings.InstanceNameCreating {
+		if member.Name == ig.Settings.InstanceNameCreating {
 			// It must be running to start the deletion
 			continue
 		}
 
-		if member.Name == ig.PluginSettings.InstanceNameRemoving {
+		if member.Name == ig.Settings.InstanceNameRemoving {
 			// Already deleting...
 			succeededMu.Lock()
 			succeeded = append(succeeded, strconv.FormatUint(member.VMID, 10))

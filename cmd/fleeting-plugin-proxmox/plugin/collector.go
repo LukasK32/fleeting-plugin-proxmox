@@ -67,7 +67,7 @@ func (ig *InstanceGroup) collectRemovedInstances() {
 			continue
 		}
 
-		if member.Name != ig.PluginSettings.InstanceNameRemoving {
+		if member.Name != ig.Settings.InstanceNameRemoving {
 			continue
 		}
 

@@ -50,7 +50,7 @@ func TestIntegration(t *testing.T) {
 		*pluginBinaryPath,
 		integration.Config{
 			PluginConfig: plugin.InstanceGroup{
-				PluginSettings: config.PluginSettings,
+				Settings: config.PluginSettings,
 			},
 			ConnectorConfig: config.ConnectorConfig,
 			MaxInstances:    config.MaxInstances,
