@@ -1,0 +1,106 @@
+name: release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build-${{matrix.platform.os}}-${{matrix.platform.architecture}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        platform:
+          - os: darwin
+            architecture: amd64
+          - os: darwin
+            architecture: arm64
+          - os: freebsd
+            architecture: amd64
+          - os: freebsd
+            architecture: arm64
+          - os: freebsd
+            architecture: 386
+          - os: freebsd
+            architecture: arm
+          - os: linux
+            architecture: amd64
+          - os: linux
+            architecture: arm64
+          - os: linux
+            architecture: arm
+          - os: linux
+            architecture: s390x
+          - os: linux
+            architecture: ppc64le
+          - os: linux
+            architecture: 386
+          - os: windows
+            architecture: amd64
+          - os: windows
+            architecture: 386
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.3'
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: ls -lah cmd/fleeting-plugin-proxmox
+      - run: make -o vendor --always-make bin/fleeting-plugin-proxmox
+        env:
+          GOOS: ${{matrix.platform.os}}
+          GOARCH: ${{matrix.platform.architecture}}
+      - run: mkdir -p dist/${{matrix.platform.os}}-${{matrix.platform.architecture}}
+      - run: mv bin/fleeting-plugin-proxmox dist/${{matrix.platform.os}}-${{matrix.platform.architecture}}/plugin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{matrix.platform.os}}-${{matrix.platform.architecture}}
+          path: dist/${{matrix.platform.os}}-${{matrix.platform.architecture}}/plugin
+          if-no-files-found: error
+          retention-days: 1
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: [build]
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.3'
+      - run: go install gitlab.com/gitlab-org/fleeting/fleeting-artifact/cmd/fleeting-artifact@v0.0.0-20240501171108-612a68737bba
+      - run: mkdir -p dist
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - run: |
+          for OS_ARCH in $(ls ./dist); do
+            OS=$(echo "${OS_ARCH}" | cut -d- -f1)
+            ARCH=$(echo "${OS_ARCH}" | cut -d- -f2)
+
+            EXT=""
+            if [ "$OS" = "windows" ]; then EXT=".exe"; fi
+
+            mkdir -p "./dist/${OS}/${ARCH}"
+            mv "./dist/${OS_ARCH}/plugin" "./dist/${OS}/${ARCH}/plugin${EXT}"
+            rm -r "./dist/${OS_ARCH}"
+            chmod +x "./dist/${OS}/${ARCH}/plugin${EXT}"
+          done
+      - run: find ./dist
+      - run: fleeting-artifact login -username "${{ github.actor }}" -password "${{ secrets.GITHUB_TOKEN }}" "ghcr.io"
+      - env:
+          VERSION: ${{github.ref_name}}
+        run: |
+          if [ "$VERSION" = "main" ]; then export VERSION="0.0.0-bleeding"; fi
+          export REPOSITORY=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          fleeting-artifact release "${REPOSITORY}:${VERSION#v}"

@@ -5,10 +5,22 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 .DEFAULT_GOAL := all
 
+################################################################################
+# Configurable variables
+-include .env
+
+GOOS        ?= ""
+GOARCH      ?= ""
+CGO_ENABLED ?= 0
+
+################################################################################
+# Functions
 define INFO
 	@echo -e "\e[32m----- $(1)\e[0m"
 endef
 
+################################################################################
+# All
 all: build
 .PHONY: all
 
@@ -72,7 +84,7 @@ build: bin/fleeting-plugin-proxmox
 bin/fleeting-plugin-proxmox: vendor $(shell find cmd -name *.go)
 	@$(call INFO,"Building $@")
 	@mkdir -p $(shell dirname $@)
-	go build -o $@ ./cmd/fleeting-plugin-proxmox
+	GOOS="${GOOS}" GOARCH="${GOARCH}" CGO_ENABLED="${CGO_ENABLED}" go build -ldflags "-w -extldflags '-static'" -o $@ ./cmd/fleeting-plugin-proxmox
 
 ################################################################################
 # Tests
