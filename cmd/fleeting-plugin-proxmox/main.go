@@ -16,11 +16,17 @@ var licenses string
 
 func main() {
 	var (
+		showHelp     = flag.Bool("help", false, "Show help and exit")
 		showVersion  = flag.Bool("version", false, "Show version information and exit")
 		showLicenses = flag.Bool("licenses", false, "Show licenses information and exit")
 	)
 
 	flag.Parse()
+
+	if *showHelp {
+		printHelp()
+		os.Exit(0)
+	}
 
 	if *showVersion {
 		printVersion()
@@ -33,6 +39,11 @@ func main() {
 	}
 
 	plugin.Serve(&proxmox.InstanceGroup{})
+}
+
+func printHelp() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
 }
 
 func printVersion() {
