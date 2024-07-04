@@ -20,19 +20,49 @@ vendor: go.mod go.sum
 	@$(call INFO,"Vendoring Go modules")
 	go mod vendor
 
+tools/go-licenses:
+	@$(call INFO,"Installing tool $(shell basename $@)")
+	GOBIN=$$(realpath $$(dirname $@)) go install github.com/google/go-licenses@v1.6.0
+
 tools/golangci-lint:
-	@$(call INFO,"Installing golangci-lint")
+	@$(call INFO,"Installing tool $(shell basename $@)")
 	GOBIN=$$(realpath $$(dirname $@)) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
 
 ################################################################################
-# Linters
-lint: lint-go
+# Linters (and checks)
+lint: lint-go check-licenses
 .PHONY: lint
 
 lint-go: vendor tools/golangci-lint
 	@$(call INFO,"Linting Go")
 	./tools/golangci-lint run -v
 .PHONY: lint-go
+
+check-licenses: tools/go-licenses vendor
+	@$(call INFO,"Checking third-party licenses")
+	./tools/go-licenses check ./... --include_tests --disallowed_types unknown,forbidden,restricted
+.PHONY: check-licenses
+
+################################################################################
+# Generators
+generate: cmd/fleeting-plugin-proxmox/licenses.txt
+.PHONY: generate
+
+cmd/fleeting-plugin-proxmox/licenses.txt: tools/go-licenses vendor
+	$(eval LICENSES_DIR := $(shell mktemp -d))
+	echo -e "" > $@;
+	@$(call INFO,"Saving licenses")
+	./tools/go-licenses save ./... --include_tests --force --save_path "${LICENSES_DIR}"
+	@$(call INFO,"Generating $@")
+	for FILE_PATH in $$(find "${LICENSES_DIR}" -type f | sort); do \
+		echo -e "$${FILE_PATH#${LICENSES_DIR}/}:\n" >> $@; \
+		while read -r LINE; do \
+			echo "	$$LINE" >> $@; \
+		done < $$FILE_PATH; \
+		echo -e "" >> $@; \
+	done
+	@$(call INFO,"Removing temporary directory")
+	rm -rf "${LICENSES_DIR}"
 
 ################################################################################
 # Builds
@@ -65,5 +95,9 @@ integration-test: bin/fleeting-plugin-proxmox
 # Cleanup
 clean:
 	@$(call INFO,"Cleaning")
-	rm -rf vendor bin tools/golangci-lint
+	rm -rf \
+		bin \
+		tools/go-licenses \
+		tools/golangci-lint \
+		vendor
 .PHONY: clean
