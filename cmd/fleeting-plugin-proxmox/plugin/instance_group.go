@@ -41,6 +41,12 @@ type InstanceGroup struct {
 
 	// Wait group for the collector.
 	collectorWaitGroup sync.WaitGroup `json:"-"`
+
+	// Trigger to shutdown session ticket refresher.
+	sessionTicketRefresherShutdownTrigger chan struct{} `json:"-"`
+
+	// Wait group for session ticket refresher.
+	sessionTicketRefresherWaitGroup sync.WaitGroup `json:"-"`
 }
 
 // Init implements provider.InstanceGroup.
@@ -51,6 +57,7 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 	ig.FleetingSettings = settings
 	ig.instanceCollectionTrigger = make(chan struct{}, triggerChannelCapacity)
 	ig.collectorShutdownTrigger = make(chan struct{}, 1)
+	ig.sessionTicketRefresherShutdownTrigger = make(chan struct{}, 1)
 
 	if err := ig.Settings.CheckRequiredFields(); err != nil {
 		return provider.ProviderInfo{}, err
@@ -78,6 +85,9 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 	//nolint:contextcheck
 	ig.startRemovedInstanceCollector()
 
+	//nolint:contextcheck
+	ig.startSessionTicketRefresher()
+
 	return provider.ProviderInfo{
 		ID:      ig.Settings.Pool,
 		MaxSize: *ig.Settings.MaxInstances,
@@ -87,7 +97,10 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 // Shutdown implements provider.InstanceGroup.
 func (ig *InstanceGroup) Shutdown(_ context.Context) error {
 	ig.collectorShutdownTrigger <- struct{}{}
+	ig.sessionTicketRefresherShutdownTrigger <- struct{}{}
+
 	ig.collectorWaitGroup.Wait()
+	ig.sessionTicketRefresherWaitGroup.Wait()
 
 	return nil
 }
