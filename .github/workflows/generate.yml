@@ -22,4 +22,7 @@ jobs:
       - run: make cmd/fleeting-plugin-proxmox/licenses.txt
       - shell: bash
         run: |
+          git diff
+      - shell: bash
+        run: |
           [[ -z "$(git status -s)" ]]
