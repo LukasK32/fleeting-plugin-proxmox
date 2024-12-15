@@ -66,7 +66,7 @@ cmd/fleeting-plugin-proxmox/licenses.txt: tools/go-licenses vendor
 	@$(call INFO,"Saving licenses")
 	./tools/go-licenses save ./... --include_tests --force --save_path "${LICENSES_DIR}"
 	@$(call INFO,"Generating $@")
-	for FILE_PATH in $$(find "${LICENSES_DIR}" -type f | sort); do \
+	for FILE_PATH in $$(find "${LICENSES_DIR}" -type f | LC_ALL=C sort); do \
 		echo -e "$${FILE_PATH#${LICENSES_DIR}/}:\n" >> $@; \
 		while read -r LINE; do \
 			echo "	$$LINE" >> $@; \
