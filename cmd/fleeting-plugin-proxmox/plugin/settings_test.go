@@ -30,6 +30,7 @@ func TestSettings_fillWithDefaults(t *testing.T) {
 	require.Equal(t, "fleeting-running", settings.InstanceNameRunning)
 	require.Equal(t, "fleeting-removing", settings.InstanceNameRemoving)
 	require.Equal(t, "ens18", settings.InstanceNetworkInterface)
+	require.Equal(t, "ipv4", settings.InstanceNetworkProtocol)
 
 	settings2 := Settings{
 		InstanceNameCreating: sampleInstanceNameCreating,
@@ -128,6 +129,19 @@ func TestSettings_checkRequiredFields(t *testing.T) {
 				MaxInstances:        &sampleMaxInstances,
 			},
 			expectedError: nil,
+		},
+		{
+			name: "Invalid protocol",
+			settings: Settings{
+				URL:                     sampleURL,
+				CredentialsFilePath:     sampleCredentialsPath,
+				Pool:                    samplePool,
+				Storage:                 sampleStorage,
+				TemplateID:              &sampleTemplateID,
+				MaxInstances:        	 &sampleMaxInstances,
+				InstanceNetworkProtocol: "invalid-protocol",
+			},
+			expectedError: ErrSettingInvalidParameter,
 		},
 	}
 
