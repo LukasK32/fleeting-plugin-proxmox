@@ -47,17 +47,17 @@ func (ig *InstanceGroup) collectRemovedInstances() {
 	ctx, cancel := context.WithTimeout(context.Background(), collectionTimeout)
 	defer cancel()
 
-	ig.instanceClonningMu.Lock()
+	ig.instanceCloningMu.Lock()
 
 	pool, err := ig.getProxmoxPool(ctx)
 	if err != nil {
 		ig.log.Error("collector failed to list instances", "err", err)
-		ig.instanceClonningMu.Unlock()
+		ig.instanceCloningMu.Unlock()
 
 		return
 	}
 
-	ig.instanceClonningMu.Unlock()
+	ig.instanceCloningMu.Unlock()
 
 	var wg sync.WaitGroup
 	defer wg.Wait()

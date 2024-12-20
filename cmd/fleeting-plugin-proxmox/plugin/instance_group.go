@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"slices"
 	"strconv"
 	"sync"
@@ -19,7 +20,7 @@ var _ provider.InstanceGroup = (*InstanceGroup)(nil)
 
 const triggerChannelCapacity = 100
 
-var ErrNoIPv4Address = errors.New("failed to determine IPv4 address for instance")
+var ErrNoIPAddress = errors.New("failed to determine IP address for instance")
 
 type InstanceGroup struct {
 	Settings         `json:",inline"`
@@ -28,10 +29,10 @@ type InstanceGroup struct {
 	log     hclog.Logger    `json:"-"`
 	proxmox *proxmox.Client `json:"-"`
 
-	// This mutex is used when clonning template for new instances. It is required for blocking other
+	// This mutex is used when cloning template for new instances. It is required for blocking other
 	// operations like collection or update, because when new instance is created with recycled ID then for
 	// a brief period it will be reported from Proxmox with old name (e.g. InstanceNameRemoving).
-	instanceClonningMu sync.Mutex `json:"-"`
+	instanceCloningMu sync.Mutex `json:"-"`
 
 	// Trigger for collector to start removed instances collection.
 	instanceCollectionTrigger chan struct{} `json:"-"`
@@ -118,12 +119,12 @@ func (ig *InstanceGroup) Increase(ctx context.Context, count int) (int, error) {
 		succeeded   = 0
 		succeededMu = new(sync.Mutex)
 
-		// We need to mutex clonning as Proxmox will fail multiple requests in parallel
+		// We need to mutex cloning as Proxmox will fail multiple requests in parallel
 		cloneMu = new(sync.Mutex)
 	)
 
-	ig.instanceClonningMu.Lock()
-	defer ig.instanceClonningMu.Unlock()
+	ig.instanceCloningMu.Lock()
+	defer ig.instanceCloningMu.Unlock()
 
 	for n := 0; n < count; n++ {
 		errorGroup.Go(func() error {
@@ -150,8 +151,8 @@ func (ig *InstanceGroup) Increase(ctx context.Context, count int) (int, error) {
 
 // Update implements provider.InstanceGroup.
 func (ig *InstanceGroup) Update(ctx context.Context, update func(instance string, state provider.State)) error {
-	ig.instanceClonningMu.Lock()
-	defer ig.instanceClonningMu.Unlock()
+	ig.instanceCloningMu.Lock()
+	defer ig.instanceCloningMu.Unlock()
 
 	pool, err := ig.getProxmoxPool(ctx)
 	if err != nil {
@@ -183,6 +184,7 @@ func (ig *InstanceGroup) Update(ctx context.Context, update func(instance string
 }
 
 // ConnectInfo implements provider.InstanceGroup.
+//nolint:gocognit,cyclop,goconst
 func (ig *InstanceGroup) ConnectInfo(ctx context.Context, instance string) (provider.ConnectInfo, error) {
 	VMID, err := strconv.Atoi(instance)
 	if err != nil {
@@ -199,26 +201,79 @@ func (ig *InstanceGroup) ConnectInfo(ctx context.Context, instance string) (prov
 		return provider.ConnectInfo{}, fmt.Errorf("failed to retrieve instance vmid='%d' interfaces: %w", VMID, err)
 	}
 
+	requested := ig.Settings.InstanceNetworkProtocol
+	internalIP := ""
+	externalIP := ""
+	potentialInternalIPv4 := ""
+	potentialExternalIPv4 := ""
+
 	for _, networkInterface := range networkInterfaces {
 		if networkInterface.Name != ig.Settings.InstanceNetworkInterface {
 			continue
 		}
 
+		// Iterate through all IP addresses available on this interface.
 		for _, address := range networkInterface.IPAddresses {
-			if address.IPAddressType != "ipv4" {
+			foundIP := net.ParseIP(address.IPAddress)
+
+			// Skip loopback IPs 127.0.0.0/8 and ::1
+			if foundIP.IsLoopback() {
 				continue
+			}	
+
+			if address.IPAddressType == "ipv4" {
+				if foundIP.IsPrivate() {
+					potentialInternalIPv4 = address.IPAddress
+				} else if foundIP.IsGlobalUnicast() {
+					potentialExternalIPv4 = address.IPAddress
+				}
 			}
 
-			return provider.ConnectInfo{
-				ID:              instance,
-				InternalAddr:    address.IPAddress,
-				ExternalAddr:    address.IPAddress,
-				ConnectorConfig: ig.FleetingSettings.ConnectorConfig,
-			}, nil
+			if address.IPAddressType == "ipv6" {
+				if foundIP.IsPrivate() {
+					internalIP = address.IPAddress
+				} else if foundIP.IsGlobalUnicast() {
+					externalIP = address.IPAddress
+				}
+			}
 		}
 	}
 
-	return provider.ConnectInfo{}, ErrNoIPv4Address
+	// At this point, externalIP and internalIP are IPv6 addresses. 
+	// If the user requested "any", prioritize these. 
+	// If the user requested "ipv4", overwrite them with IPv4 addresses.
+
+	if requested == "ipv4" || (requested == "any" && internalIP == "" && externalIP == "") {
+		// If any protocol was requested and we didn't find a working IPv6 address,
+		// or if the user explicitly requested to use IPv4,
+		// use the IPv4 addresses.
+		internalIP = potentialInternalIPv4
+		externalIP = potentialExternalIPv4
+	} 
+
+	if internalIP == "" && externalIP == "" {
+		// Neither internal nor external IP matching the configured address type was found.
+		// Abort.
+		return provider.ConnectInfo{}, ErrNoIPAddress
+	}
+
+	// If we only found an internal or only an external IP, set the other variable to the same IP
+	// A cleaner solution would probably be to omit the empty field from the ConnectInfo response
+	// (only one of them is mandatory), but that may be a breaking change?
+	if internalIP == "" {
+		internalIP = externalIP
+	}
+
+	if externalIP == "" {
+		externalIP = internalIP
+	}
+
+	return provider.ConnectInfo{
+		ID:              instance,
+		InternalAddr:    internalIP,
+		ExternalAddr:    externalIP,
+		ConnectorConfig: ig.FleetingSettings.ConnectorConfig,
+	}, nil
 }
 
 // Decrease implements provider.InstanceGroup.
