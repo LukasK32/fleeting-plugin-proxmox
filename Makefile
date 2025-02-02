@@ -91,7 +91,7 @@ bin/fleeting-plugin-proxmox: vendor $(shell find cmd -name *.go)
 test: unit-test integration-test
 .PHONY: test
 
-unit-test:
+unit-test: vendor
 	@$(call INFO,"Running unit tests")
 	go test -v ./cmd/...
 .PHONY: unit-test
