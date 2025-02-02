@@ -138,7 +138,7 @@ func TestSettings_checkRequiredFields(t *testing.T) {
 				Pool:                    samplePool,
 				Storage:                 sampleStorage,
 				TemplateID:              &sampleTemplateID,
-				MaxInstances:        	 &sampleMaxInstances,
+				MaxInstances:            &sampleMaxInstances,
 				InstanceNetworkProtocol: "invalid-protocol",
 			},
 			expectedError: ErrSettingInvalidParameter,

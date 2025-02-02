@@ -35,3 +35,5 @@ linters-settings:
     case: 
       rules:
         json: snake
+  cyclop:
+    max-complexity: 15
