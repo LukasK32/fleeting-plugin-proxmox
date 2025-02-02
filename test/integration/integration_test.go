@@ -19,6 +19,7 @@ var (
 
 // See integration.Config.
 type IntegrationTestConfig struct {
+	Name            string                   `json:"name"`
 	PluginSettings  plugin.Settings          `json:"plugin_settings"`
 	ConnectorConfig provider.ConnectorConfig `json:"connector_config"`
 	MaxInstances    int                      `json:"max_instances"`
@@ -40,21 +41,25 @@ func TestIntegration(t *testing.T) {
 	}
 	defer configFile.Close()
 
-	config := new(IntegrationTestConfig)
-	if err := json.NewDecoder(configFile).Decode(&config); err != nil {
+	configs := new([]IntegrationTestConfig)
+	if err := json.NewDecoder(configFile).Decode(&configs); err != nil {
 		t.Errorf("failed to read config file: %v", err)
 	}
 
-	integration.TestProvisioning(
-		t,
-		*pluginBinaryPath,
-		integration.Config{
-			PluginConfig: plugin.InstanceGroup{
-				Settings: config.PluginSettings,
-			},
-			ConnectorConfig: config.ConnectorConfig,
-			MaxInstances:    config.MaxInstances,
-			UseExternalAddr: config.UseExternalAddr,
-		},
-	)
+	for _, config := range *configs {
+		t.Run(config.Name, func(t *testing.T) {
+			integration.TestProvisioning(
+				t,
+				*pluginBinaryPath,
+				integration.Config{
+					PluginConfig: plugin.InstanceGroup{
+						Settings: config.PluginSettings,
+					},
+					ConnectorConfig: config.ConnectorConfig,
+					MaxInstances:    config.MaxInstances,
+					UseExternalAddr: config.UseExternalAddr,
+				},
+			)
+		})
+	}
 }
