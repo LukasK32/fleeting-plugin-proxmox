@@ -91,7 +91,7 @@ bin/fleeting-plugin-proxmox: vendor $(shell find cmd -name *.go)
 test: unit-test integration-test
 .PHONY: test
 
-unit-test:
+unit-test: vendor
 	@$(call INFO,"Running unit tests")
 	go test -v ./cmd/...
 .PHONY: unit-test
@@ -99,6 +99,7 @@ unit-test:
 integration-test: bin/fleeting-plugin-proxmox
 	@$(call INFO,"Running integration tests")
 	go test -v $(shell go list ./test/integration) \
+		-timeout 30m \
 		-plugin-binary-path="$(PWD)/bin/fleeting-plugin-proxmox" \
 		-config-path="$(PWD)/config.json"
 .PHONY: integration-test

@@ -2,9 +2,7 @@ package plugin
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net"
 	"slices"
 	"strconv"
 	"sync"
@@ -19,8 +17,6 @@ import (
 var _ provider.InstanceGroup = (*InstanceGroup)(nil)
 
 const triggerChannelCapacity = 100
-
-var ErrNoIPAddress = errors.New("failed to determine IP address for instance")
 
 type InstanceGroup struct {
 	Settings         `json:",inline"`
@@ -184,7 +180,6 @@ func (ig *InstanceGroup) Update(ctx context.Context, update func(instance string
 }
 
 // ConnectInfo implements provider.InstanceGroup.
-//nolint:gocognit,cyclop,goconst
 func (ig *InstanceGroup) ConnectInfo(ctx context.Context, instance string) (provider.ConnectInfo, error) {
 	VMID, err := strconv.Atoi(instance)
 	if err != nil {
@@ -201,77 +196,15 @@ func (ig *InstanceGroup) ConnectInfo(ctx context.Context, instance string) (prov
 		return provider.ConnectInfo{}, fmt.Errorf("failed to retrieve instance vmid='%d' interfaces: %w", VMID, err)
 	}
 
-	requested := ig.Settings.InstanceNetworkProtocol
-	internalIP := ""
-	externalIP := ""
-	potentialInternalIPv4 := ""
-	potentialExternalIPv4 := ""
-
-	for _, networkInterface := range networkInterfaces {
-		if networkInterface.Name != ig.Settings.InstanceNetworkInterface {
-			continue
-		}
-
-		// Iterate through all IP addresses available on this interface.
-		for _, address := range networkInterface.IPAddresses {
-			foundIP := net.ParseIP(address.IPAddress)
-
-			// Skip loopback IPs 127.0.0.0/8 and ::1
-			if foundIP.IsLoopback() {
-				continue
-			}	
-
-			if address.IPAddressType == "ipv4" {
-				if foundIP.IsPrivate() {
-					potentialInternalIPv4 = address.IPAddress
-				} else if foundIP.IsGlobalUnicast() {
-					potentialExternalIPv4 = address.IPAddress
-				}
-			}
-
-			if address.IPAddressType == "ipv6" {
-				if foundIP.IsPrivate() {
-					internalIP = address.IPAddress
-				} else if foundIP.IsGlobalUnicast() {
-					externalIP = address.IPAddress
-				}
-			}
-		}
-	}
-
-	// At this point, externalIP and internalIP are IPv6 addresses. 
-	// If the user requested "any", prioritize these. 
-	// If the user requested "ipv4", overwrite them with IPv4 addresses.
-
-	if requested == "ipv4" || (requested == "any" && internalIP == "" && externalIP == "") {
-		// If any protocol was requested and we didn't find a working IPv6 address,
-		// or if the user explicitly requested to use IPv4,
-		// use the IPv4 addresses.
-		internalIP = potentialInternalIPv4
-		externalIP = potentialExternalIPv4
-	} 
-
-	if internalIP == "" && externalIP == "" {
-		// Neither internal nor external IP matching the configured address type was found.
-		// Abort.
-		return provider.ConnectInfo{}, ErrNoIPAddress
-	}
-
-	// If we only found an internal or only an external IP, set the other variable to the same IP
-	// A cleaner solution would probably be to omit the empty field from the ConnectInfo response
-	// (only one of them is mandatory), but that may be a breaking change?
-	if internalIP == "" {
-		internalIP = externalIP
-	}
-
-	if externalIP == "" {
-		externalIP = internalIP
+	internalAddress, externalAddress, err := determineAddresses(networkInterfaces, ig.InstanceNetworkInterface, ig.InstanceNetworkProtocol)
+	if err != nil {
+		return provider.ConnectInfo{}, err
 	}
 
 	return provider.ConnectInfo{
 		ID:              instance,
-		InternalAddr:    internalIP,
-		ExternalAddr:    externalIP,
+		InternalAddr:    internalAddress,
+		ExternalAddr:    externalAddress,
 		ConnectorConfig: ig.FleetingSettings.ConnectorConfig,
 	}, nil
 }
