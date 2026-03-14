@@ -32,6 +32,8 @@ const (
 	DefaultInstanceNameCreating = "fleeting-creating"
 	DefaultInstanceNameRunning  = "fleeting-running"
 	DefaultInstanceNameRemoving = "fleeting-removing"
+
+	DefaultProxmoxTaskWaitInterval = 10
 )
 
 // Plguin settings.
@@ -71,6 +73,9 @@ type Settings struct {
 
 	// Name to set for instances during removal.
 	InstanceNameRemoving string `json:"instance_name_removing"`
+
+	// How often should task status be queried
+	ProxmoxTaskWaitInterval *int `json:"proxmox_task_wait_interval"`
 }
 
 func (s *Settings) FillWithDefaults() {
@@ -96,6 +101,10 @@ func (s *Settings) FillWithDefaults() {
 
 	if s.InstanceNetworkProtocol == "" {
 		s.InstanceNetworkProtocol = DefaultInstanceNetworkProtocol
+	}
+
+	if s.ProxmoxTaskWaitInterval == nil {
+		*s.ProxmoxTaskWaitInterval = DefaultProxmoxTaskWaitInterval
 	}
 }
 
