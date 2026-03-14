@@ -24,6 +24,7 @@ See [Releases](https://github.com/LukasK32/fleeting-plugin-proxmox/releases) for
 | `instance_name_creating`     | string                    | `fleeting-creating`                | Name to set for instances during creation.                                                   |
 | `instance_name_running`      | string                    | `fleeting-running`                 | Name to set for running instances.                                                           |
 | `instance_name_removing`     | string                    | `fleeting-removing`                | Name to set for instances during removal.                                                    |
+| `proxmox_task_wait_interval` | int                       | 10                                 | How often to check for Proxmox task completion                                               |
 
 ### Credentials file
 
