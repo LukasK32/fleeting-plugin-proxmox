@@ -61,7 +61,7 @@ func determinePossibleAddresses(networkInterfaces []*proxmox.AgentNetworkIface, 
 				continue
 			}
 
-			if address.IPAddressType == "ipv4" {
+			if address.IPAddressType == NetworkProtocolIPv4 {
 				if parsedAddress.IsPrivate() {
 					internalIPv4 = address.IPAddress
 				} else if parsedAddress.IsGlobalUnicast() {
@@ -69,7 +69,7 @@ func determinePossibleAddresses(networkInterfaces []*proxmox.AgentNetworkIface, 
 				}
 			}
 
-			if address.IPAddressType == "ipv6" {
+			if address.IPAddressType == NetworkProtocolIPv6 {
 				if parsedAddress.IsPrivate() {
 					internalIPv6 = address.IPAddress
 				} else if parsedAddress.IsGlobalUnicast() {

@@ -25,32 +25,18 @@ jobs:
             architecture: amd64
           - os: freebsd
             architecture: arm64
-          - os: freebsd
-            architecture: 386
-          - os: freebsd
-            architecture: arm
           - os: linux
             architecture: amd64
           - os: linux
             architecture: arm64
-          - os: linux
-            architecture: arm
-          - os: linux
-            architecture: s390x
-          - os: linux
-            architecture: ppc64le
-          - os: linux
-            architecture: 386
           - os: windows
             architecture: amd64
-          - os: windows
-            architecture: 386
     timeout-minutes: 10
     steps:
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
-          go-version: '1.22.3'
-      - uses: actions/checkout@v4
+          go-version: '1.26.4'
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: ls -lah cmd/fleeting-plugin-proxmox
@@ -60,7 +46,7 @@ jobs:
           GOARCH: ${{matrix.platform.architecture}}
       - run: mkdir -p dist/${{matrix.platform.os}}-${{matrix.platform.architecture}}
       - run: mv bin/fleeting-plugin-proxmox dist/${{matrix.platform.os}}-${{matrix.platform.architecture}}/plugin
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{matrix.platform.os}}-${{matrix.platform.architecture}}
           path: dist/${{matrix.platform.os}}-${{matrix.platform.architecture}}/plugin
@@ -75,12 +61,12 @@ jobs:
       packages: write
       id-token: write
     steps:
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
-          go-version: '1.22.3'
-      - run: go install gitlab.com/gitlab-org/fleeting/fleeting-artifact/cmd/fleeting-artifact@v0.0.0-20240501171108-612a68737bba
+          go-version: '1.26.4'
+      - run: go install gitlab.com/gitlab-org/fleeting/fleeting-artifact/cmd/fleeting-artifact@v0.0.0-20260629160204-1cce9dc42429
       - run: mkdir -p dist
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
       - run: |

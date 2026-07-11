@@ -180,6 +180,31 @@ github.com/diskfs/go-diskfs/LICENSE:
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 
+github.com/djherbis/times/LICENSE:
+
+	The MIT License (MIT)
+	
+	Copyright (c) 2015 Dustin H
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+	
+
 github.com/fatih/color/LICENSE.md:
 
 	The MIT License (MIT)
@@ -463,32 +488,27 @@ github.com/golang/protobuf/ptypes/empty/LICENSE:
 
 github.com/gorilla/websocket/LICENSE:
 
-	Copyright (c) 2023 The Gorilla Authors. All rights reserved.
+	Copyright (c) 2013 The Gorilla WebSocket Authors. All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
-	met:
+	modification, are permitted provided that the following conditions are met:
 	
-	* Redistributions of source code must retain the above copyright
-	notice, this list of conditions and the following disclaimer.
-	* Redistributions in binary form must reproduce the above
-	copyright notice, this list of conditions and the following disclaimer
-	in the documentation and/or other materials provided with the
-	distribution.
-	* Neither the name of Google Inc. nor the names of its
-	contributors may be used to endorse or promote products derived from
-	this software without specific prior written permission.
+	Redistributions of source code must retain the above copyright notice, this
+	list of conditions and the following disclaimer.
 	
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-	OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-	LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+	Redistributions in binary form must reproduce the above copyright notice,
+	this list of conditions and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+	FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+	DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+	SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+	CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 github.com/hashicorp/go-cleanhttp/LICENSE:
@@ -1052,8 +1072,32 @@ github.com/hashicorp/go-plugin/.gitignore:
 	.DS_Store
 	.idea
 
+github.com/hashicorp/go-plugin/.go-version:
+
+	1.24.1
+
 github.com/hashicorp/go-plugin/CHANGELOG.md:
 
+	## v1.7.0
+	
+	CHANGES:
+	
+	* When go-plugin encounters a stack trace on the server stderr stream, it now raises output to a log-level of Error instead of Debug. [[GH-292](https://github.com/hashicorp/go-plugin/pull/292)]
+	
+	ENHANCEMENTS:
+	
+	* Don't spend resources parsing log lines when logging is disabled [[GH-352](https://github.com/hashicorp/go-plugin/pull/352)]
+	
+	## v1.6.2
+	
+	ENHANCEMENTS:
+	
+	* Added support for gRPC dial options to the `Dial` API [[GH-257](https://github.com/hashicorp/go-plugin/pull/257)]
+	
+	BUGS:
+	
+	* Fixed a bug where reattaching to a plugin that exits could kill an unrelated process [[GH-320](https://github.com/hashicorp/go-plugin/pull/320)]
+	
 	## v1.6.1
 	
 	BUGS:
@@ -1169,7 +1213,7 @@ github.com/hashicorp/go-plugin/CHANGELOG.md:
 
 github.com/hashicorp/go-plugin/LICENSE:
 
-	Copyright (c) 2016 HashiCorp, Inc.
+	Copyright IBM Corp. 2016, 2025
 	
 	Mozilla Public License, version 2.0
 	
@@ -1695,7 +1739,7 @@ github.com/hashicorp/go-plugin/README.md:
 
 github.com/hashicorp/go-plugin/buf.gen.yaml:
 
-	# Copyright (c) HashiCorp, Inc.
+	# Copyright IBM Corp. 2016, 2025
 	# SPDX-License-Identifier: MPL-2.0
 	
 	version: v1
@@ -1712,7 +1756,7 @@ github.com/hashicorp/go-plugin/buf.gen.yaml:
 
 github.com/hashicorp/go-plugin/buf.yaml:
 
-	# Copyright (c) HashiCorp, Inc.
+	# Copyright IBM Corp. 2016, 2025
 	# SPDX-License-Identifier: MPL-2.0
 	
 	version: v1
@@ -1721,7 +1765,7 @@ github.com/hashicorp/go-plugin/buf.yaml:
 
 github.com/hashicorp/go-plugin/client.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -1737,7 +1781,6 @@ github.com/hashicorp/go-plugin/client.go:
 	"fmt"
 	"hash"
 	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
@@ -1805,7 +1848,7 @@ github.com/hashicorp/go-plugin/client.go:
 	//
 	// Plugin hosts should use one Client for each plugin executable. To
 	// dispense a plugin type, use the `Client.Client` function, and then
-	// cal `Dispense`. This awkward API is mostly historical but is used to split
+	// call `Dispense`. This awkward API is mostly historical but is used to split
 	// the client that deals with subprocess management and the client that
 	// does RPC management.
 	//
@@ -1925,7 +1968,7 @@ github.com/hashicorp/go-plugin/client.go:
 	// SyncStdout, SyncStderr can be set to override the
 	// respective os.Std* values in the plugin. Care should be taken to
 	// avoid races here. If these are nil, then this will be set to
-	// ioutil.Discard.
+	// io.Discard.
 	SyncStdout io.Writer
 	SyncStderr io.Writer
 	
@@ -2068,7 +2111,7 @@ github.com/hashicorp/go-plugin/client.go:
 	if err != nil {
 	return false, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	
 	_, err = io.Copy(s.Hash, file)
 	if err != nil {
@@ -2124,7 +2167,7 @@ github.com/hashicorp/go-plugin/client.go:
 	}
 	
 	if config.Stderr == nil {
-	config.Stderr = ioutil.Discard
+	config.Stderr = io.Discard
 	}
 	
 	if config.SyncStdout == nil {
@@ -2237,7 +2280,7 @@ github.com/hashicorp/go-plugin/client.go:
 	c.clientWaitGroup.Wait()
 	
 	if hostSocketDir != "" {
-	os.RemoveAll(hostSocketDir)
+	_ = os.RemoveAll(hostSocketDir)
 	}
 	
 	// Make sure there is no reference to the old process after it has been
@@ -2393,7 +2436,7 @@ github.com/hashicorp/go-plugin/client.go:
 	// Setup a temporary certificate for client/server mtls, and send the public
 	// certificate to the plugin.
 	if c.config.AutoMTLS {
-	c.logger.Info("configuring client automatic mTLS")
+	c.logger.Debug("configuring client automatic mTLS")
 	certPEM, keyPEM, err := generateCert()
 	if err != nil {
 	c.logger.Error("failed to generate client certificate", "error", err)
@@ -2466,7 +2509,7 @@ github.com/hashicorp/go-plugin/client.go:
 	rErr := recover()
 	
 	if err != nil || rErr != nil {
-	runner.Kill(context.Background())
+	_ = runner.Kill(context.Background())
 	}
 	
 	if rErr != nil {
@@ -2477,9 +2520,12 @@ github.com/hashicorp/go-plugin/client.go:
 	// Create a context for when we kill
 	c.doneCtx, c.ctxCancel = context.WithCancel(context.Background())
 	
+	// Add two to pipesWaitGroup: one for logStderr, one for the goroutine
+	// below that consumes Stdout.  We mustn't continue to Add once we might Wait.
+	c.pipesWaitGroup.Add(2)
+	
 	// Start goroutine that logs the stderr
 	c.clientWaitGroup.Add(1)
-	c.pipesWaitGroup.Add(1)
 	// logStderr calls c.pipesWaitGroup.Done()
 	go c.logStderr(runner.Name(), runner.Stderr())
 	
@@ -2503,7 +2549,7 @@ github.com/hashicorp/go-plugin/client.go:
 	c.logger.Info("plugin process exited", "plugin", runner.Name(), "id", runner.ID())
 	}
 	
-	os.Stderr.Sync()
+	_ = os.Stderr.Sync()
 	
 	// Set that we exited, which takes a lock
 	c.l.Lock()
@@ -2515,7 +2561,6 @@ github.com/hashicorp/go-plugin/client.go:
 	// out of stdout
 	linesCh := make(chan string)
 	c.clientWaitGroup.Add(1)
-	c.pipesWaitGroup.Add(1)
 	go func() {
 	defer c.clientWaitGroup.Done()
 	defer c.pipesWaitGroup.Done()
@@ -2576,15 +2621,15 @@ github.com/hashicorp/go-plugin/client.go:
 	var coreProtocol int
 	coreProtocol, err = strconv.Atoi(parts[0])
 	if err != nil {
-	err = fmt.Errorf("Error parsing core protocol version: %s", err)
+	err = fmt.Errorf("error parsing core protocol version: %s", err)
 	return
 	}
 	
 	if coreProtocol != CoreProtocolVersion {
-	err = fmt.Errorf("Incompatible core API version with plugin. "+
+	err = fmt.Errorf("incompatible core API version with plugin. "+
 	"Plugin version: %s, Core version: %d\n\n"+
 	"To fix this, the plugin usually only needs to be recompiled.\n"+
-	"Please report this to the plugin author.", parts[0], CoreProtocolVersion)
+	"Please report this to the plugin author", parts[0], CoreProtocolVersion)
 	return
 	}
 	}
@@ -2610,10 +2655,16 @@ github.com/hashicorp/go-plugin/client.go:
 	switch network {
 	case "tcp":
 	addr, err = net.ResolveTCPAddr("tcp", address)
+	if err != nil {
+	return nil, err
+	}
 	case "unix":
 	addr, err = net.ResolveUnixAddr("unix", address)
+	if err != nil {
+	return nil, err
+	}
 	default:
-	err = fmt.Errorf("Unknown address type: %s", address)
+	return nil, fmt.Errorf("unknown address type: %s", address)
 	}
 	
 	// If we have a server type, then record that. We default to net/rpc
@@ -2631,7 +2682,7 @@ github.com/hashicorp/go-plugin/client.go:
 	}
 	}
 	if !found {
-	err = fmt.Errorf("Unsupported plugin protocol %q. Supported: %v",
+	err = fmt.Errorf("unsupported plugin protocol %q. Supported: %v",
 	c.protocol, c.config.AllowedProtocols)
 	return addr, err
 	}
@@ -2709,7 +2760,7 @@ github.com/hashicorp/go-plugin/client.go:
 	defer c.ctxCancel()
 	
 	// Wait for the process to die
-	r.Wait(context.Background())
+	_ = r.Wait(context.Background())
 	
 	// Log so we can see it
 	c.logger.Debug("reattached plugin process exited")
@@ -2764,7 +2815,7 @@ github.com/hashicorp/go-plugin/client.go:
 	return version, plugins, nil
 	}
 	
-	return 0, nil, fmt.Errorf("Incompatible API version with plugin. "+
+	return 0, nil, fmt.Errorf("incompatible API version with plugin. "+
 	"Plugin version: %d, Client versions: %d", serverVersion, clientVersions)
 	}
 	
@@ -2820,8 +2871,8 @@ github.com/hashicorp/go-plugin/client.go:
 	return c.protocol
 	}
 	
-	func netAddrDialer(addr net.Addr) func(string, time.Duration) (net.Conn, error) {
-	return func(_ string, _ time.Duration) (net.Conn, error) {
+	func netAddrDialer(addr net.Addr) func(context.Context, string) (net.Conn, error) {
+	return func(context.Context, string) (net.Conn, error) {
 	// Connect to the client
 	conn, err := net.Dial(addr.Network(), addr.String())
 	if err != nil {
@@ -2829,7 +2880,7 @@ github.com/hashicorp/go-plugin/client.go:
 	}
 	if tcpConn, ok := conn.(*net.TCPConn); ok {
 	// Make sure to set keep alive so that the connection doesn't die
-	tcpConn.SetKeepAlive(true)
+	_ = tcpConn.SetKeepAlive(true)
 	}
 	
 	return conn, nil
@@ -2838,7 +2889,7 @@ github.com/hashicorp/go-plugin/client.go:
 	
 	// dialer is compatible with grpc.WithDialer and creates the connection
 	// to the plugin.
-	func (c *Client) dialer(_ string, timeout time.Duration) (net.Conn, error) {
+	func (c *Client) dialer(ctx context.Context, _ string) (net.Conn, error) {
 	muxer, err := c.getGRPCMuxer(c.address)
 	if err != nil {
 	return nil, err
@@ -2851,7 +2902,7 @@ github.com/hashicorp/go-plugin/client.go:
 	return nil, err
 	}
 	} else {
-	conn, err = netAddrDialer(c.address)("", timeout)
+	conn, err = netAddrDialer(c.address)(ctx, "")
 	if err != nil {
 	return nil, err
 	}
@@ -2885,13 +2936,21 @@ github.com/hashicorp/go-plugin/client.go:
 	func (c *Client) logStderr(name string, r io.Reader) {
 	defer c.clientWaitGroup.Done()
 	defer c.pipesWaitGroup.Done()
+	
 	l := c.logger.Named(filepath.Base(name))
+	loggerLevel := l.GetLevel()
+	loggerDisabled := loggerLevel == hclog.Off
 	
 	reader := bufio.NewReaderSize(r, c.config.PluginLogBufferSize)
 	// continuation indicates the previous line was a prefix
 	continuation := false
 	
+	// inPanic indicates we saw the start of a stack trace and should divert all
+	// remaining untagged lines to stderr
+	var inPanic bool
+	
 	for {
+	
 	line, isPrefix, err := reader.ReadLine()
 	switch {
 	case err == io.EOF:
@@ -2901,7 +2960,7 @@ github.com/hashicorp/go-plugin/client.go:
 	return
 	}
 	
-	c.config.Stderr.Write(line)
+	_, _ = c.config.Stderr.Write(line)
 	
 	// The line was longer than our max token size, so it's likely
 	// incomplete and won't unmarshal.
@@ -2910,14 +2969,26 @@ github.com/hashicorp/go-plugin/client.go:
 	
 	// if we're finishing a continued line, add the newline back in
 	if !isPrefix {
-	c.config.Stderr.Write([]byte{'\n'})
+	_, _ = c.config.Stderr.Write([]byte{'\n'})
 	}
 	
 	continuation = isPrefix
 	continue
 	}
 	
-	c.config.Stderr.Write([]byte{'\n'})
+	_, _ = c.config.Stderr.Write([]byte{'\n'})
+	
+	//
+	// Any side-effects other than writing to the hclog logger must be
+	// above this point!
+	//
+	
+	if loggerDisabled {
+	// If the logger we'd be writing to is completely disabled then
+	// we can skip all of the parsing work to decide what log level
+	// we'd use to write this line.
+	continue
+	}
 	
 	entry, err := parseJSON(line)
 	// If output is not JSON format, print directly to Debug
@@ -2935,14 +3006,25 @@ github.com/hashicorp/go-plugin/client.go:
 	l.Warn(line)
 	case strings.HasPrefix(line, "[ERROR]"):
 	l.Error(line)
+	case strings.HasPrefix(line, "panic: ") || strings.HasPrefix(line, "fatal error: "):
+	inPanic = true
+	fallthrough
+	case inPanic:
+	l.Error(line)
 	default:
 	l.Debug(line)
 	}
 	} else {
-	out := flattenKVPairs(entry.KVPairs)
+	logLevel := hclog.LevelFromString(entry.Level)
+	if logLevel != hclog.NoLevel && logLevel < loggerLevel {
+	// The logger will ignore this log entry anyway, so we
+	// won't spend any more time preparing it.
+	continue
+	}
 	
+	out := flattenKVPairs(entry.KVPairs)
 	out = append(out, "timestamp", entry.Timestamp.Format(hclog.TimeFormat))
-	switch hclog.LevelFromString(entry.Level) {
+	switch logLevel {
 	case hclog.Trace:
 	l.Trace(entry.Message, out...)
 	case hclog.Debug:
@@ -2965,7 +3047,7 @@ github.com/hashicorp/go-plugin/client.go:
 
 github.com/hashicorp/go-plugin/constants.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -2984,7 +3066,7 @@ github.com/hashicorp/go-plugin/constants.go:
 
 github.com/hashicorp/go-plugin/discover.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -3018,7 +3100,7 @@ github.com/hashicorp/go-plugin/discover.go:
 
 github.com/hashicorp/go-plugin/error.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -3048,7 +3130,7 @@ github.com/hashicorp/go-plugin/error.go:
 
 github.com/hashicorp/go-plugin/grpc_broker.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -3150,8 +3232,6 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	case s.recv <- i:
 	}
 	}
-	
-	return nil
 	}
 	
 	// Send is used by the GRPCBroker to pass connection information into the stream
@@ -3260,8 +3340,6 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	case s.recv <- i:
 	}
 	}
-	
-	return nil
 	}
 	
 	// Send is used by the GRPCBroker to pass connection information into the stream
@@ -3432,7 +3510,7 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	log.Printf("[ERR] plugin: plugin acceptAndServe error: %s", err)
 	return
 	}
-	defer ln.Close()
+	defer func() { _ = ln.Close() }()
 	
 	var opts []grpc.ServerOption
 	if b.tls != nil {
@@ -3468,7 +3546,7 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	}
 	
 	// Block until we are done
-	g.Run()
+	_ = g.Run()
 	}
 	
 	// Close closes the stream and all servers.
@@ -3552,8 +3630,8 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	return nil
 	}
 	
-	func (b *GRPCBroker) muxDial(id uint32) func(string, time.Duration) (net.Conn, error) {
-	return func(string, time.Duration) (net.Conn, error) {
+	func (b *GRPCBroker) muxDial(id uint32) func(context.Context, string) (net.Conn, error) {
+	return func(context.Context, string) (net.Conn, error) {
 	b.dialMutex.Lock()
 	defer b.dialMutex.Unlock()
 	
@@ -3573,9 +3651,12 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	}
 	
 	// Dial opens a connection by ID.
-	func (b *GRPCBroker) Dial(id uint32) (conn *grpc.ClientConn, err error) {
+	func (b *GRPCBroker) Dial(id uint32) (conn *grpc.ClientConn, err error) { return b.DialWithOptions(id) }
+	
+	// Dial opens a connection by ID with options.
+	func (b *GRPCBroker) DialWithOptions(id uint32, opts ...grpc.DialOption) (conn *grpc.ClientConn, err error) {
 	if b.muxer.Enabled() {
-	return dialGRPCConn(b.tls, b.muxDial(id))
+	return dialGRPCConn(b.tls, b.muxDial(id), opts...)
 	}
 	
 	var c *plugin.ConnInfo
@@ -3604,13 +3685,13 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 	case "unix":
 	addr, err = net.ResolveUnixAddr("unix", address)
 	default:
-	err = fmt.Errorf("Unknown address type: %s", c.Address)
+	err = fmt.Errorf("unknown address type: %s", c.Address)
 	}
 	if err != nil {
 	return nil, err
 	}
 	
-	return dialGRPCConn(b.tls, netAddrDialer(addr))
+	return dialGRPCConn(b.tls, netAddrDialer(addr), opts...)
 	}
 	
 	// NextId returns a unique ID to use next.
@@ -3705,7 +3786,7 @@ github.com/hashicorp/go-plugin/grpc_broker.go:
 
 github.com/hashicorp/go-plugin/grpc_client.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -3716,20 +3797,20 @@ github.com/hashicorp/go-plugin/grpc_client.go:
 	"fmt"
 	"math"
 	"net"
-	"time"
 	
 	"github.com/hashicorp/go-plugin/internal/plugin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	)
 	
-	func dialGRPCConn(tls *tls.Config, dialer func(string, time.Duration) (net.Conn, error), dialOpts ...grpc.DialOption) (*grpc.ClientConn, error) {
+	func dialGRPCConn(tls *tls.Config, dialer func(context.Context, string) (net.Conn, error), dialOpts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	// Build dialing options.
 	opts := make([]grpc.DialOption, 0)
 	
 	// We use a custom dialer so that we can connect over unix domain sockets.
-	opts = append(opts, grpc.WithDialer(dialer))
+	opts = append(opts, grpc.WithContextDialer(dialer))
 	
 	// Fail right away
 	opts = append(opts, grpc.FailOnNonTempDialError(true))
@@ -3737,7 +3818,7 @@ github.com/hashicorp/go-plugin/grpc_client.go:
 	// If we have no TLS configuration set, we need to explicitly tell grpc
 	// that we're connecting with an insecure connection.
 	if tls == nil {
-	opts = append(opts, grpc.WithInsecure())
+	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else {
 	opts = append(opts, grpc.WithTransportCredentials(
 	credentials.NewTLS(tls)))
@@ -3777,7 +3858,7 @@ github.com/hashicorp/go-plugin/grpc_client.go:
 	brokerGRPCClient := newGRPCBrokerClient(conn)
 	broker := newGRPCBroker(brokerGRPCClient, c.config.TLSConfig, c.unixSocketCfg, c.runner, muxer)
 	go broker.Run()
-	go brokerGRPCClient.StartStream()
+	go func() { _ = brokerGRPCClient.StartStream() }()
 	
 	// Start the stdio client
 	stdioClient, err := newGRPCStdioClient(doneCtx, c.logger.Named("stdio"), conn)
@@ -3810,8 +3891,8 @@ github.com/hashicorp/go-plugin/grpc_client.go:
 	
 	// ClientProtocol impl.
 	func (c *GRPCClient) Close() error {
-	c.broker.Close()
-	c.controller.Shutdown(c.doneCtx, &plugin.Empty{})
+	_ = c.broker.Close()
+	_, _ = c.controller.Shutdown(c.doneCtx, &plugin.Empty{})
 	return c.Conn.Close()
 	}
 	
@@ -3842,7 +3923,7 @@ github.com/hashicorp/go-plugin/grpc_client.go:
 
 github.com/hashicorp/go-plugin/grpc_controller.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -3871,7 +3952,7 @@ github.com/hashicorp/go-plugin/grpc_controller.go:
 
 github.com/hashicorp/go-plugin/grpc_server.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -3992,7 +4073,7 @@ github.com/hashicorp/go-plugin/grpc_server.go:
 	s.server.Stop()
 	
 	if s.broker != nil {
-	s.broker.Close()
+	_ = s.broker.Close()
 	s.broker = nil
 	}
 	}
@@ -4003,7 +4084,7 @@ github.com/hashicorp/go-plugin/grpc_server.go:
 	s.server.GracefulStop()
 	
 	if s.broker != nil {
-	s.broker.Close()
+	_ = s.broker.Close()
 	s.broker = nil
 	}
 	}
@@ -4041,7 +4122,7 @@ github.com/hashicorp/go-plugin/grpc_server.go:
 
 github.com/hashicorp/go-plugin/grpc_stdio.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -4221,7 +4302,7 @@ github.com/hashicorp/go-plugin/grpc_stdio.go:
 	for {
 	// Make our data buffer. We allocate a new one per loop iteration
 	// so that we can send it over the channel.
-	var data [1024]byte
+	var data [grpcStdioBuffer]byte
 	
 	// Read the data, this will block until data is available
 	n, err := bufsrc.Read(data[:])
@@ -4254,7 +4335,7 @@ github.com/hashicorp/go-plugin/grpc_stdio.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/addr_translator.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package cmdrunner
@@ -4273,7 +4354,7 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/addr_translator.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/cmd_reattach.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package cmdrunner
@@ -4303,10 +4384,9 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/cmd_reattach.go:
 	// doesn't actually return an error if it can't find the process.
 	conn, err := net.Dial(addr.Network(), addr.String())
 	if err != nil {
-	p.Kill()
 	return nil, ErrProcessNotFound
 	}
-	conn.Close()
+	_ = conn.Close()
 	
 	return &CmdAttachedRunner{
 	pid:     pid,
@@ -4339,7 +4419,7 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/cmd_reattach.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/cmd_runner.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package cmdrunner
@@ -4361,7 +4441,7 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/cmd_runner.go:
 	
 	// ErrProcessNotFound is returned when a client is instantiated to
 	// reattach to an existing process and it isn't found.
-	ErrProcessNotFound = errors.New("Reattachment process not found")
+	ErrProcessNotFound = errors.New("reattachment process not found")
 	)
 	
 	const unrecognizedRemotePluginMessage = `This usually means
@@ -4471,11 +4551,10 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/cmd_runner.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/notes_unix.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	//go:build !windows
-	// +build !windows
 	
 	package cmdrunner
 	
@@ -4526,13 +4605,13 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/notes_unix.go:
 	}
 	
 	if elfFile, err := elf.Open(path); err == nil {
-	defer elfFile.Close()
+	defer func() { _ = elfFile.Close() }()
 	notes += fmt.Sprintf("  ELF architecture: %s (current architecture: %s)\n", elfFile.Machine, runtime.GOARCH)
 	} else if machoFile, err := macho.Open(path); err == nil {
-	defer machoFile.Close()
+	defer func() { _ = machoFile.Close() }()
 	notes += fmt.Sprintf("  MachO architecture: %s (current architecture: %s)\n", machoFile.Cpu, runtime.GOARCH)
 	} else if peFile, err := pe.Open(path); err == nil {
-	defer peFile.Close()
+	defer func() { _ = peFile.Close() }()
 	machine, ok := peTypes[peFile.Machine]
 	if !ok {
 	machine = "unknown"
@@ -4544,11 +4623,10 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/notes_unix.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/notes_windows.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	//go:build windows
-	// +build windows
 	
 	package cmdrunner
 	
@@ -4593,7 +4671,7 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/notes_windows.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/process.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package cmdrunner
@@ -4621,11 +4699,10 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/process.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/process_posix.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	//go:build !windows
-	// +build !windows
 	
 	package cmdrunner
 	
@@ -4639,6 +4716,11 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/process_posix.go:
 	func _pidAlive(pid int) bool {
 	proc, err := os.FindProcess(pid)
 	if err == nil {
+	// On Linux with Go 1.23+, FindProcess opens a pidfd which must be
+	// released or it leaks an FD on every call. Release errors are
+	// intentionally ignored; the handle is short-lived and there's
+	// nothing actionable to recover from a release failure.
+	defer func() { _ = proc.Release() }()
 	err = proc.Signal(syscall.Signal(0))
 	}
 	
@@ -4647,7 +4729,7 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/process_posix.go:
 
 github.com/hashicorp/go-plugin/internal/cmdrunner/process_windows.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package cmdrunner
@@ -4683,7 +4765,7 @@ github.com/hashicorp/go-plugin/internal/cmdrunner/process_windows.go:
 
 github.com/hashicorp/go-plugin/internal/grpcmux/blocked_client_listener.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package grpcmux
@@ -4737,7 +4819,7 @@ github.com/hashicorp/go-plugin/internal/grpcmux/blocked_client_listener.go:
 
 github.com/hashicorp/go-plugin/internal/grpcmux/blocked_server_listener.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package grpcmux
@@ -4789,7 +4871,7 @@ github.com/hashicorp/go-plugin/internal/grpcmux/blocked_server_listener.go:
 
 github.com/hashicorp/go-plugin/internal/grpcmux/grpc_client_muxer.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package grpcmux
@@ -4897,7 +4979,7 @@ github.com/hashicorp/go-plugin/internal/grpcmux/grpc_client_muxer.go:
 
 github.com/hashicorp/go-plugin/internal/grpcmux/grpc_muxer.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package grpcmux
@@ -4941,7 +5023,7 @@ github.com/hashicorp/go-plugin/internal/grpcmux/grpc_muxer.go:
 
 github.com/hashicorp/go-plugin/internal/grpcmux/grpc_server_muxer.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package grpcmux
@@ -5401,12 +5483,12 @@ github.com/hashicorp/go-plugin/internal/plugin/grpc_broker.pb.go:
 
 github.com/hashicorp/go-plugin/internal/plugin/grpc_broker.proto:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	syntax = "proto3";
 	package plugin;
-	option go_package = "./plugin";
+	option go_package = "github.com/hashicorp/go-plugin/internal/plugin";
 	
 	message ConnInfo {
 	uint32 service_id = 1;
@@ -5715,12 +5797,12 @@ github.com/hashicorp/go-plugin/internal/plugin/grpc_controller.pb.go:
 
 github.com/hashicorp/go-plugin/internal/plugin/grpc_controller.proto:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	syntax = "proto3";
 	package plugin;
-	option go_package = "./plugin";
+	option go_package = "github.com/hashicorp/go-plugin/internal/plugin";
 	
 	message Empty {
 	}
@@ -6073,12 +6155,12 @@ github.com/hashicorp/go-plugin/internal/plugin/grpc_stdio.pb.go:
 
 github.com/hashicorp/go-plugin/internal/plugin/grpc_stdio.proto:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	syntax = "proto3";
 	package plugin;
-	option go_package = "./plugin";
+	option go_package = "github.com/hashicorp/go-plugin/internal/plugin";
 	
 	import "google/protobuf/empty.proto";
 	
@@ -6260,7 +6342,7 @@ github.com/hashicorp/go-plugin/internal/plugin/grpc_stdio_grpc.pb.go:
 
 github.com/hashicorp/go-plugin/log_entry.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -6272,10 +6354,10 @@ github.com/hashicorp/go-plugin/log_entry.go:
 	
 	// logEntry is the JSON payload that gets sent to Stderr from the plugin to the host
 	type logEntry struct {
-	Message   string        `json:"@message"`
-	Level     string        `json:"@level"`
-	Timestamp time.Time     `json:"timestamp"`
-	KVPairs   []*logEntryKV `json:"kv_pairs"`
+	Message   string       `json:"@message"`
+	Level     string       `json:"@level"`
+	Timestamp time.Time    `json:"timestamp"`
+	KVPairs   []logEntryKV `json:"kv_pairs"`
 	}
 	
 	// logEntryKV is a key value pair within the Output payload
@@ -6286,7 +6368,7 @@ github.com/hashicorp/go-plugin/log_entry.go:
 	
 	// flattenKVPairs is used to flatten KVPair slice into []interface{}
 	// for hclog consumption.
-	func flattenKVPairs(kvs []*logEntryKV) []interface{} {
+	func flattenKVPairs(kvs []logEntryKV) []interface{} {
 	var result []interface{}
 	for _, kv := range kvs {
 	result = append(result, kv.Key)
@@ -6328,7 +6410,7 @@ github.com/hashicorp/go-plugin/log_entry.go:
 	
 	// Parse dynamic KV args from the hclog payload.
 	for k, v := range raw {
-	entry.KVPairs = append(entry.KVPairs, &logEntryKV{
+	entry.KVPairs = append(entry.KVPairs, logEntryKV{
 	Key:   k,
 	Value: v,
 	})
@@ -6339,7 +6421,7 @@ github.com/hashicorp/go-plugin/log_entry.go:
 
 github.com/hashicorp/go-plugin/mtls.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -6418,7 +6500,7 @@ github.com/hashicorp/go-plugin/mtls.go:
 
 github.com/hashicorp/go-plugin/mux_broker.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -6488,7 +6570,7 @@ github.com/hashicorp/go-plugin/mux_broker.go:
 	
 	// Ack our connection
 	if err := binary.Write(c, binary.LittleEndian, id); err != nil {
-	c.Close()
+	_ = c.Close()
 	return nil, err
 	}
 	
@@ -6525,18 +6607,18 @@ github.com/hashicorp/go-plugin/mux_broker.go:
 	
 	// Write the stream ID onto the wire.
 	if err := binary.Write(stream, binary.LittleEndian, id); err != nil {
-	stream.Close()
+	_ = stream.Close()
 	return nil, err
 	}
 	
 	// Read the ack that we connected. Then we're off!
 	var ack uint32
 	if err := binary.Read(stream, binary.LittleEndian, &ack); err != nil {
-	stream.Close()
+	_ = stream.Close()
 	return nil, err
 	}
 	if ack != id {
-	stream.Close()
+	_ = stream.Close()
 	return nil, fmt.Errorf("bad ack: %d (expected %d)", ack, id)
 	}
 	
@@ -6568,7 +6650,7 @@ github.com/hashicorp/go-plugin/mux_broker.go:
 	// Read the stream ID from the stream
 	var id uint32
 	if err := binary.Read(stream, binary.LittleEndian, &id); err != nil {
-	stream.Close()
+	_ = stream.Close()
 	continue
 	}
 	
@@ -6619,16 +6701,14 @@ github.com/hashicorp/go-plugin/mux_broker.go:
 	// If we timed out, then check if we have a channel in the buffer,
 	// and if so, close it.
 	if timeout {
-	select {
-	case s := <-p.ch:
-	s.Close()
-	}
+	s := <-p.ch
+	_ = s.Close()
 	}
 	}
 
 github.com/hashicorp/go-plugin/plugin.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	// The plugin package exposes functions and helpers for communicating to
@@ -6692,14 +6772,14 @@ github.com/hashicorp/go-plugin/plugin.go:
 
 github.com/hashicorp/go-plugin/process.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
 
 github.com/hashicorp/go-plugin/protocol.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -6750,7 +6830,7 @@ github.com/hashicorp/go-plugin/protocol.go:
 
 github.com/hashicorp/go-plugin/rpc_client.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -6785,7 +6865,7 @@ github.com/hashicorp/go-plugin/rpc_client.go:
 	}
 	if tcpConn, ok := conn.(*net.TCPConn); ok {
 	// Make sure to set keep alive so that the connection doesn't die
-	tcpConn.SetKeepAlive(true)
+	_ = tcpConn.SetKeepAlive(true)
 	}
 	
 	if c.config.TLSConfig != nil {
@@ -6795,7 +6875,7 @@ github.com/hashicorp/go-plugin/rpc_client.go:
 	// Create the actual RPC client
 	result, err := NewRPCClient(conn, c.config.Plugins)
 	if err != nil {
-	conn.Close()
+	_ = conn.Close()
 	return nil, err
 	}
 	
@@ -6804,7 +6884,7 @@ github.com/hashicorp/go-plugin/rpc_client.go:
 	c.config.SyncStdout,
 	c.config.SyncStderr)
 	if err != nil {
-	result.Close()
+	_ = result.Close()
 	return nil, err
 	}
 	
@@ -6817,23 +6897,23 @@ github.com/hashicorp/go-plugin/rpc_client.go:
 	// Create the yamux client so we can multiplex
 	mux, err := yamux.Client(conn, nil)
 	if err != nil {
-	conn.Close()
+	_ = conn.Close()
 	return nil, err
 	}
 	
 	// Connect to the control stream.
 	control, err := mux.Open()
 	if err != nil {
-	mux.Close()
+	_ = mux.Close()
 	return nil, err
 	}
 	
 	// Connect stdout, stderr streams
 	stdstream := make([]net.Conn, 2)
-	for i, _ := range stdstream {
+	for i := range stdstream {
 	stdstream[i], err = mux.Open()
 	if err != nil {
-	mux.Close()
+	_ = mux.Close()
 	return nil, err
 	}
 	}
@@ -6926,7 +7006,7 @@ github.com/hashicorp/go-plugin/rpc_client.go:
 
 github.com/hashicorp/go-plugin/rpc_server.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -6997,7 +7077,7 @@ github.com/hashicorp/go-plugin/rpc_server.go:
 	// First create the yamux server to wrap this connection
 	mux, err := yamux.Server(conn, nil)
 	if err != nil {
-	conn.Close()
+	_ = conn.Close()
 	log.Printf("[ERR] plugin: error creating yamux server: %s", err)
 	return
 	}
@@ -7005,7 +7085,7 @@ github.com/hashicorp/go-plugin/rpc_server.go:
 	// Accept the control connection
 	control, err := mux.Accept()
 	if err != nil {
-	mux.Close()
+	_ = mux.Close()
 	if err != io.EOF {
 	log.Printf("[ERR] plugin: error accepting control connection: %s", err)
 	}
@@ -7018,7 +7098,7 @@ github.com/hashicorp/go-plugin/rpc_server.go:
 	for i := range stdstream {
 	stdstream[i], err = mux.Accept()
 	if err != nil {
-	mux.Close()
+	_ = mux.Close()
 	log.Printf("[ERR] plugin: accepting stream %d: %s", i, err)
 	return
 	}
@@ -7035,10 +7115,10 @@ github.com/hashicorp/go-plugin/rpc_server.go:
 	// Use the control connection to build the dispenser and serve the
 	// connection.
 	server := rpc.NewServer()
-	server.RegisterName("Control", &controlServer{
+	_ = server.RegisterName("Control", &controlServer{
 	server: s,
 	})
-	server.RegisterName("Dispenser", &dispenseServer{
+	_ = server.RegisterName("Dispenser", &dispenseServer{
 	broker:  broker,
 	plugins: s.Plugins,
 	})
@@ -7138,7 +7218,7 @@ github.com/hashicorp/go-plugin/rpc_server.go:
 
 github.com/hashicorp/go-plugin/runner/runner.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package runner
@@ -7213,7 +7293,7 @@ github.com/hashicorp/go-plugin/runner/runner.go:
 
 github.com/hashicorp/go-plugin/server.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -7505,7 +7585,7 @@ github.com/hashicorp/go-plugin/server.go:
 	// Close the listener on return. We wrap this in a func() on purpose
 	// because the "listener" reference may change to TLS.
 	defer func() {
-	listener.Close()
+	_ = listener.Close()
 	}()
 	
 	var tlsConfig *tls.Config
@@ -7522,7 +7602,7 @@ github.com/hashicorp/go-plugin/server.go:
 	// If the client is configured using AutoMTLS, the certificate will be here,
 	// and we need to generate our own in response.
 	if tlsConfig == nil && clientCert != "" {
-	logger.Info("configuring server automatic mTLS")
+	logger.Debug("configuring server automatic mTLS")
 	clientCertPool := x509.NewCertPool()
 	if !clientCertPool.AppendCertsFromPEM([]byte(clientCert)) {
 	logger.Error("client cert provided but failed to parse", "cert", clientCert)
@@ -7658,7 +7738,7 @@ github.com/hashicorp/go-plugin/server.go:
 	protocolLine += fmt.Sprintf("|%v", grpcBrokerMultiplexingSupported)
 	}
 	fmt.Printf("%s\n", protocolLine)
-	os.Stdout.Sync()
+	_ = os.Stdout.Sync()
 	} else if ch := opts.Test.ReattachConfigCh; ch != nil {
 	// Send back the reattach config that can be used. This isn't
 	// quite ready if they connect immediately but the client should
@@ -7720,7 +7800,7 @@ github.com/hashicorp/go-plugin/server.go:
 	// Cancellation. We can stop the server by closing the listener.
 	// This isn't graceful at all but this is currently only used by
 	// tests and its our only way to stop.
-	listener.Close()
+	_ = listener.Close()
 	
 	// If this is a grpc server, then we also ask the server itself to
 	// end which will kill all connections. There isn't an easy way to do
@@ -7761,7 +7841,7 @@ github.com/hashicorp/go-plugin/server.go:
 	default:
 	minPort, err = strconv.ParseInt(envMinPort, 10, 32)
 	if err != nil {
-	return nil, fmt.Errorf("Couldn't get value from PLUGIN_MIN_PORT: %v", err)
+	return nil, fmt.Errorf("couldn't get value from PLUGIN_MIN_PORT: %v", err)
 	}
 	}
 	
@@ -7771,7 +7851,7 @@ github.com/hashicorp/go-plugin/server.go:
 	default:
 	maxPort, err = strconv.ParseInt(envMaxPort, 10, 32)
 	if err != nil {
-	return nil, fmt.Errorf("Couldn't get value from PLUGIN_MAX_PORT: %v", err)
+	return nil, fmt.Errorf("couldn't get value from PLUGIN_MAX_PORT: %v", err)
 	}
 	}
 	
@@ -7787,7 +7867,7 @@ github.com/hashicorp/go-plugin/server.go:
 	}
 	}
 	
-	return nil, errors.New("Couldn't bind plugin TCP listener")
+	return nil, errors.New("couldn't bind plugin TCP listener")
 	}
 	
 	func serverListener_unix(unixSocketCfg UnixSocketConfig) (net.Listener, error) {
@@ -7881,7 +7961,7 @@ github.com/hashicorp/go-plugin/server.go:
 
 github.com/hashicorp/go-plugin/server_mux.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -7918,7 +7998,7 @@ github.com/hashicorp/go-plugin/server_mux.go:
 
 github.com/hashicorp/go-plugin/stream.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -7942,7 +8022,7 @@ github.com/hashicorp/go-plugin/stream.go:
 
 github.com/hashicorp/go-plugin/testing.go:
 
-	// Copyright (c) HashiCorp, Inc.
+	// Copyright IBM Corp. 2016, 2025
 	// SPDX-License-Identifier: MPL-2.0
 	
 	package plugin
@@ -7953,11 +8033,12 @@ github.com/hashicorp/go-plugin/testing.go:
 	"io"
 	"net"
 	"net/rpc"
+	"testing"
 	
 	hclog "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin/internal/grpcmux"
-	"github.com/mitchellh/go-testing-interface"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	)
 	
 	// TestOptions allows specifying options that can affect the behavior of the
@@ -7977,7 +8058,7 @@ github.com/hashicorp/go-plugin/testing.go:
 	
 	// TestConn is a helper function for returning a client and server
 	// net.Conn connected to each other.
-	func TestConn(t testing.T) (net.Conn, net.Conn) {
+	func TestConn(t testing.TB) (net.Conn, net.Conn) {
 	// Listen to any local port. This listener will be closed
 	// after a single connection is established.
 	l, err := net.Listen("tcp", "127.0.0.1:0")
@@ -7990,7 +8071,7 @@ github.com/hashicorp/go-plugin/testing.go:
 	doneCh := make(chan struct{})
 	go func() {
 	defer close(doneCh)
-	defer l.Close()
+	defer func() { _ = l.Close() }()
 	var err error
 	serverConn, err = l.Accept()
 	if err != nil {
@@ -8011,7 +8092,7 @@ github.com/hashicorp/go-plugin/testing.go:
 	}
 	
 	// TestRPCConn returns a rpc client and server connected to each other.
-	func TestRPCConn(t testing.T) (*rpc.Client, *rpc.Server) {
+	func TestRPCConn(t testing.TB) (*rpc.Client, *rpc.Server) {
 	clientConn, serverConn := TestConn(t)
 	
 	server := rpc.NewServer()
@@ -8023,7 +8104,7 @@ github.com/hashicorp/go-plugin/testing.go:
 	
 	// TestPluginRPCConn returns a plugin RPC client and server that are connected
 	// together and configured.
-	func TestPluginRPCConn(t testing.T, ps map[string]Plugin, opts *TestOptions) (*RPCClient, *RPCServer) {
+	func TestPluginRPCConn(t testing.TB, ps map[string]Plugin, opts *TestOptions) (*RPCClient, *RPCServer) {
 	// Create two net.Conns we can use to shuttle our control connection
 	clientConn, serverConn := TestConn(t)
 	
@@ -8051,7 +8132,7 @@ github.com/hashicorp/go-plugin/testing.go:
 	// TestGRPCConn returns a gRPC client conn and grpc server that are connected
 	// together and configured. The register function is used to register services
 	// prior to the Serve call. This is used to test gRPC connections.
-	func TestGRPCConn(t testing.T, register func(*grpc.Server)) (*grpc.ClientConn, *grpc.Server) {
+	func TestGRPCConn(t testing.TB, register func(*grpc.Server)) (*grpc.ClientConn, *grpc.Server) {
 	// Create a listener
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -8060,26 +8141,27 @@ github.com/hashicorp/go-plugin/testing.go:
 	
 	server := grpc.NewServer()
 	register(server)
-	go server.Serve(l)
+	go func() { _ = server.Serve(l) }()
 	
 	// Connect to the server
 	conn, err := grpc.Dial(
 	l.Addr().String(),
 	grpc.WithBlock(),
-	grpc.WithInsecure())
+	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 	t.Fatalf("err: %s", err)
 	}
 	
 	// Connection successful, close the listener
-	l.Close()
+	_ = l.Close()
 	
 	return conn, server
 	}
 	
 	// TestPluginGRPCConn returns a plugin gRPC client and server that are connected
 	// together and configured. This is used to test gRPC connections.
-	func TestPluginGRPCConn(t testing.T, multiplex bool, ps map[string]Plugin) (*GRPCClient, *GRPCServer) {
+	func TestPluginGRPCConn(t testing.TB, multiplex bool, ps map[string]Plugin) (*GRPCClient, *GRPCServer) {
 	// Create a listener
 	ln, err := serverListener(UnixSocketConfig{})
 	if err != nil {
@@ -8636,6 +8718,8 @@ github.com/hashicorp/yamux/.gitignore:
 
 github.com/hashicorp/yamux/LICENSE:
 
+	Copyright (c) 2014 HashiCorp, Inc.
+	
 	Mozilla Public License, version 2.0
 	
 	1. Definitions
@@ -9342,7 +9426,6 @@ github.com/hashicorp/yamux/mux.go:
 	import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"time"
 	)
@@ -9390,7 +9473,12 @@ github.com/hashicorp/yamux/mux.go:
 	
 	// Logger is used to pass in the logger to be used. Either Logger or
 	// LogOutput can be set, not both.
-	Logger *log.Logger
+	Logger Logger
+	}
+	
+	func (c *Config) Clone() *Config {
+	c2 := *c
+	return &c2
 	}
 	
 	// DefaultConfig is used to return a default configuration
@@ -9459,6 +9547,7 @@ github.com/hashicorp/yamux/session.go:
 	import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9490,7 +9579,7 @@ github.com/hashicorp/yamux/session.go:
 	config *Config
 	
 	// logger is used for our logs
-	logger *log.Logger
+	logger Logger
 	
 	// conn is the underlying connection
 	conn io.ReadWriteCloser
@@ -9706,6 +9795,22 @@ github.com/hashicorp/yamux/session.go:
 	}
 	}
 	
+	// AcceptStream is used to block until the next available stream
+	// is ready to be accepted.
+	func (s *Session) AcceptStreamWithContext(ctx context.Context) (*Stream, error) {
+	select {
+	case <-ctx.Done():
+	return nil, ctx.Err()
+	case stream := <-s.acceptCh:
+	if err := stream.sendWindowUpdate(); err != nil {
+	return nil, err
+	}
+	return stream, nil
+	case <-s.shutdownCh:
+	return nil, s.shutdownErr
+	}
+	}
+	
 	// Close is used to close the session and all streams.
 	// Attempts to send a GoAway before closing the connection.
 	func (s *Session) Close() error {
@@ -9795,7 +9900,7 @@ github.com/hashicorp/yamux/session.go:
 	}
 	
 	// Compute the RTT
-	return time.Now().Sub(start), nil
+	return time.Since(start), nil
 	}
 	
 	// keepalive is a long running goroutine that periodically does
@@ -10291,7 +10396,7 @@ github.com/hashicorp/yamux/spec.md:
 	
 	This does introduce the possibility of a connection being rejected
 	after data has been sent already. This is a slight semantic difference
-	from TCP, where the conection cannot be refused after it is opened.
+	from TCP, where the connection cannot be refused after it is opened.
 	Clients should be prepared to handle this by checking for an error
 	that indicates a RST was received.
 	
@@ -10429,10 +10534,12 @@ github.com/hashicorp/yamux/stream.go:
 	func (s *Stream) Read(b []byte) (n int, err error) {
 	defer asyncNotify(s.recvNotifyCh)
 	START:
+	
+	// If the stream is closed and there's no data buffered, return EOF
 	s.stateLock.Lock()
 	switch s.state {
 	case streamLocalClose:
-	fallthrough
+	// LocalClose only prohibits further local writes. Handle reads normally.
 	case streamRemoteClose:
 	fallthrough
 	case streamClosed:
@@ -10472,19 +10579,22 @@ github.com/hashicorp/yamux/stream.go:
 	var timer *time.Timer
 	readDeadline := s.readDeadline.Load().(time.Time)
 	if !readDeadline.IsZero() {
-	delay := readDeadline.Sub(time.Now())
+	delay := time.Until(readDeadline)
 	timer = time.NewTimer(delay)
 	timeout = timer.C
 	}
 	select {
+	case <-s.session.shutdownCh:
 	case <-s.recvNotifyCh:
-	if timer != nil {
-	timer.Stop()
-	}
-	goto START
 	case <-timeout:
 	return 0, ErrTimeout
 	}
+	if timer != nil {
+	if !timer.Stop() {
+	<-timeout
+	}
+	}
+	goto START
 	}
 	
 	// Write is used to write to the stream
@@ -10553,18 +10663,25 @@ github.com/hashicorp/yamux/stream.go:
 	
 	WAIT:
 	var timeout <-chan time.Time
+	var timer *time.Timer
 	writeDeadline := s.writeDeadline.Load().(time.Time)
 	if !writeDeadline.IsZero() {
-	delay := writeDeadline.Sub(time.Now())
-	timeout = time.After(delay)
+	delay := time.Until(writeDeadline)
+	timer = time.NewTimer(delay)
+	timeout = timer.C
 	}
 	select {
+	case <-s.session.shutdownCh:
 	case <-s.sendNotifyCh:
-	goto START
 	case <-timeout:
 	return 0, ErrTimeout
 	}
-	return 0, nil
+	if timer != nil {
+	if !timer.Stop() {
+	<-timeout
+	}
+	}
+	goto START
 	}
 	
 	// sendFlags determines any flags that are appropriate
@@ -10714,7 +10831,7 @@ github.com/hashicorp/yamux/stream.go:
 	defer s.sendLock.Unlock()
 	hdr := header(make([]byte, headerSize))
 	hdr.encode(typeWindowUpdate, flagRST, s.id, 0)
-	s.session.sendNoWait(hdr)
+	_ = s.session.sendNoWait(hdr)
 	}
 	
 	// forceClose is used for when the session is exiting
@@ -10885,6 +11002,13 @@ github.com/hashicorp/yamux/util.go:
 	"sync"
 	"time"
 	)
+	
+	// Logger is a abstract of *log.Logger
+	type Logger interface {
+	Print(v ...interface{})
+	Printf(format string, v ...interface{})
+	Println(v ...interface{})
+	}
 	
 	var (
 	timerPool = &sync.Pool{
@@ -11996,30 +12120,6 @@ github.com/jinzhu/copier/License:
 	IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 	CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-github.com/lukask32/fleeting-plugin-proxmox/LICENSE:
-
-	MIT License
-	
-	Copyright (c) 2024 Łukasz Kirylak
-	
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
-
 github.com/luthermonson/go-proxmox/LICENSE:
 
 	
@@ -12645,30 +12745,6 @@ github.com/mattn/go-isatty/LICENSE:
 	
 	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-github.com/mitchellh/go-testing-interface/LICENSE:
-
-	The MIT License (MIT)
-	
-	Copyright (c) 2016 Mitchell Hashimoto
-	
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included in
-	all copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	THE SOFTWARE.
-
 github.com/oklog/run/LICENSE:
 
 	Apache License
@@ -12859,7 +12935,7 @@ github.com/oklog/run/LICENSE:
 	same "printed page" as the copyright notice for easier
 	identification within third-party archives.
 	
-	Copyright [yyyy] [name of copyright owner]
+	Copyright 2017 Peter Bourgon
 	
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -12872,6 +12948,30 @@ github.com/oklog/run/LICENSE:
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
+
+github.com/phenix66/fleeting-plugin-proxmox/LICENSE:
+
+	MIT License
+	
+	Copyright (c) 2024 Łukasz Kirylak
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
 
 github.com/pmezard/go-difflib/difflib/LICENSE:
 
@@ -13039,7 +13139,7 @@ golang.org/x/crypto/LICENSE:
 
 golang.org/x/mod/LICENSE:
 
-	Copyright (c) 2009 The Go Authors. All rights reserved.
+	Copyright 2009 The Go Authors.
 	
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are
@@ -13051,7 +13151,7 @@ golang.org/x/mod/LICENSE:
 	copyright notice, this list of conditions and the following disclaimer
 	in the documentation and/or other materials provided with the
 	distribution.
-	* Neither the name of Google Inc. nor the names of its
+	* Neither the name of Google LLC nor the names of its
 	contributors may be used to endorse or promote products derived from
 	this software without specific prior written permission.
 	
@@ -13069,7 +13169,7 @@ golang.org/x/mod/LICENSE:
 
 golang.org/x/net/LICENSE:
 
-	Copyright (c) 2009 The Go Authors. All rights reserved.
+	Copyright 2009 The Go Authors.
 	
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are
@@ -13081,7 +13181,7 @@ golang.org/x/net/LICENSE:
 	copyright notice, this list of conditions and the following disclaimer
 	in the documentation and/or other materials provided with the
 	distribution.
-	* Neither the name of Google Inc. nor the names of its
+	* Neither the name of Google LLC nor the names of its
 	contributors may be used to endorse or promote products derived from
 	this software without specific prior written permission.
 	
@@ -13642,31 +13742,6 @@ google.golang.org/protobuf/LICENSE:
 	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-gopkg.in/djherbis/times.v1/LICENSE:
-
-	The MIT License (MIT)
-	
-	Copyright (c) 2015 Dustin H
-	
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
-	
 
 gopkg.in/yaml.v3/LICENSE:
 

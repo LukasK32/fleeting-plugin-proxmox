@@ -15,13 +15,15 @@ const (
 	proxmoxTaskWaitInterval  = 10 * time.Second
 	proxmoxTaskWaitTimeout   = 5 * time.Minute
 	proxmoxAgentStartTimeout = 2 * time.Minute
+
+	vmOptName = "name"
+	vmOptTags = "tags"
 )
 
 var ErrCloneVMWithoutConfiguredStorage = errors.New("attempted to clone a VM without configured storage")
 
 func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.VirtualMachine, cloneMu *sync.Mutex) (int, error) {
 	VMID, task, err := ig.cloneTemplate(ctx, template, cloneMu)
-
 	if err == nil {
 		ig.log.Info("Deploying new instance", "vmid", VMID)
 
@@ -37,8 +39,27 @@ func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.V
 		return VMID, fmt.Errorf("failed to find newly deployed instance vmid='%d': %w", VMID, err)
 	}
 
+	_, err = vm.Config(ctx, proxmox.VirtualMachineOption{
+		Name:  vmOptTags,
+		Value: ig.InstanceTagsCreating,
+	})
+	if err != nil {
+		return VMID, fmt.Errorf("failed to get instance config vmid='%d': %w", VMID, err)
+	}
+
 	// Start, configure etc.
 	err = func() error {
+		if ig.Settings.InstanceAutoresizeSize != nil {
+			task, err := vm.ResizeDisk(ctx, *ig.Settings.InstanceAutoresizeDisk, *ig.Settings.InstanceAutoresizeSize)
+			if err == nil {
+				err = task.Wait(ctx, proxmoxTaskWaitInterval, proxmoxTaskWaitTimeout)
+			}
+
+			if err != nil {
+				return fmt.Errorf("failed to resize disk: %w", err)
+			}
+		}
+
 		// Start the VM
 		task, err := vm.Start(ctx)
 		if err == nil {
@@ -50,25 +71,33 @@ func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.V
 		}
 
 		// Wait for agent to start
-		if err := vm.WaitForAgent(ctx, int(proxmoxAgentStartTimeout/time.Second)); err != nil {
+		err = vm.WaitForAgent(ctx, int(proxmoxAgentStartTimeout/time.Second))
+		if err != nil {
 			return fmt.Errorf("failed when waiting for qemu agent to start on newly deployed instance: %w", err)
 		}
 
 		return nil
 	}()
 
-	newInstanceName := ig.Settings.InstanceNameRunning
+	newInstanceName := ig.InstanceNameRunning
+	newInstanceTags := ig.InstanceTagsRunning
 
 	if err != nil {
 		ig.log.Error("instance deployment failed, marking for removal", "vmid", VMID, "err", err)
-		newInstanceName = ig.Settings.InstanceNameRemoving
+		newInstanceName = ig.InstanceNameRemoving
+		newInstanceTags = ig.InstanceTagsRemoving
 	}
 
-	_, renameErr := vm.Config(ctx, proxmox.VirtualMachineOption{
-		Name:  "name",
-		Value: newInstanceName,
-	})
-
+	_, renameErr := vm.Config(ctx,
+		proxmox.VirtualMachineOption{
+			Name:  vmOptName,
+			Value: newInstanceName,
+		},
+		proxmox.VirtualMachineOption{
+			Name:  vmOptTags,
+			Value: newInstanceTags,
+		},
+	)
 	if renameErr != nil {
 		ig.log.Error("failed to rename instance", "vmid", VMID, "err", renameErr)
 	}
@@ -99,18 +128,18 @@ func (ig *InstanceGroup) cloneTemplate(ctx context.Context, template *proxmox.Vi
 
 func (ig *InstanceGroup) getTemplateCloneOptions(template *proxmox.VirtualMachine) (*proxmox.VirtualMachineCloneOptions, error) {
 	cloneOptions := &proxmox.VirtualMachineCloneOptions{
-		Name:    ig.Settings.InstanceNameCreating,
-		Pool:    ig.Settings.Pool,
-		Storage: ig.Settings.Storage,
-		Full:    1,
+		Name:    ig.InstanceNameCreating,
+		Pool:    ig.Pool,
+		Storage: ig.Storage,
+		Full:    true,
 	}
 
-	if !template.Template && ig.Settings.Storage == "" {
+	if !template.Template && ig.Storage == "" {
 		return nil, ErrCloneVMWithoutConfiguredStorage
 	}
 
-	if template.Template && ig.Settings.Storage == "" {
-		cloneOptions.Full = 0
+	if template.Template && ig.Storage == "" {
+		cloneOptions.Full = false
 	}
 
 	return cloneOptions, nil
@@ -125,13 +154,11 @@ func (ig *InstanceGroup) markStaleInstancesForRemoval(ctx context.Context) error
 	instancesToMarkForRemoval := make([]*proxmox.ClusterResource, 0, len(pool.Members))
 
 	for _, member := range pool.Members {
-		member := member
-
 		if !ig.isProxmoxResourceAnInstance(member) {
 			continue
 		}
 
-		if member.Name != ig.Settings.InstanceNameCreating {
+		if member.Name != ig.InstanceNameCreating {
 			continue
 		}
 
@@ -143,7 +170,8 @@ func (ig *InstanceGroup) markStaleInstancesForRemoval(ctx context.Context) error
 		return nil
 	}
 
-	if err := ig.markInstancesForRemoval(ctx, instancesToMarkForRemoval...); err != nil {
+	err = ig.markInstancesForRemoval(ctx, instancesToMarkForRemoval...)
+	if err != nil {
 		return fmt.Errorf("failed to mark stale instances for removal: %w", err)
 	}
 
@@ -154,8 +182,6 @@ func (ig *InstanceGroup) markInstancesForRemoval(ctx context.Context, instances 
 	var errorGroup errgroup.Group
 
 	for _, instance := range instances {
-		instance := instance
-
 		errorGroup.Go(func() error {
 			log := ig.log.With("name", instance.Name, "vmid", instance.VMID, "node", instance.Node)
 
@@ -165,11 +191,16 @@ func (ig *InstanceGroup) markInstancesForRemoval(ctx context.Context, instances 
 				return fmt.Errorf("failed to mark instance for removal: %w", err)
 			}
 
-			task, err := vm.Config(ctx, proxmox.VirtualMachineOption{
-				Name:  "name",
-				Value: ig.Settings.InstanceNameRemoving,
-			})
-
+			task, err := vm.Config(ctx,
+				proxmox.VirtualMachineOption{
+					Name:  vmOptName,
+					Value: ig.InstanceNameRemoving,
+				},
+				proxmox.VirtualMachineOption{
+					Name:  vmOptTags,
+					Value: ig.InstanceTagsRemoving,
+				},
+			)
 			if err == nil {
 				err = task.Wait(ctx, proxmoxTaskWaitInterval, proxmoxTaskWaitTimeout)
 			}
@@ -183,7 +214,8 @@ func (ig *InstanceGroup) markInstancesForRemoval(ctx context.Context, instances 
 		})
 	}
 
-	if err := errorGroup.Wait(); err != nil {
+	err := errorGroup.Wait()
+	if err != nil {
 		ig.instanceCollectionTrigger <- struct{}{}
 		return fmt.Errorf("failed to mark one or more instances for removal: %w", err)
 	}
@@ -194,5 +226,5 @@ func (ig *InstanceGroup) markInstancesForRemoval(ctx context.Context, instances 
 }
 
 func (ig *InstanceGroup) isProxmoxResourceAnInstance(member proxmox.ClusterResource) bool {
-	return member.Type == "qemu" && member.VMID != uint64(*ig.Settings.TemplateID)
+	return member.Type == "qemu" && member.VMID != uint64(*ig.TemplateID)
 }

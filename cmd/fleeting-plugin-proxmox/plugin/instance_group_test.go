@@ -14,6 +14,6 @@ func TestUnmarshallingPluginSettings(t *testing.T) {
 	err := json.Unmarshal([]byte(settingsJSON), &instance)
 	require.NoError(t, err)
 
-	require.Equal(t, "sample_url", instance.Settings.URL)
-	require.Equal(t, 5, *instance.Settings.TemplateID)
+	require.Equal(t, "sample_url", instance.URL)
+	require.Equal(t, 5, *instance.TemplateID)
 }

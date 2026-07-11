@@ -12,7 +12,7 @@ func TestInstanceGroup_templateCloneOptions(t *testing.T) {
 		name              string
 		isTemplate        bool
 		configuredStorage string
-		expectedFull      uint8
+		expectedFull      bool
 		expectedErr       error
 	}
 
@@ -21,28 +21,28 @@ func TestInstanceGroup_templateCloneOptions(t *testing.T) {
 			name:              "VM with unconfigured storage", // Error?
 			isTemplate:        false,
 			configuredStorage: "",
-			expectedFull:      1,
+			expectedFull:      true,
 			expectedErr:       ErrCloneVMWithoutConfiguredStorage,
 		},
 		{
 			name:              "VM with configured storage",
 			isTemplate:        false,
 			configuredStorage: "local",
-			expectedFull:      1,
+			expectedFull:      true,
 			expectedErr:       nil,
 		},
 		{
 			name:              "Template with unconfigured storage",
 			isTemplate:        true,
 			configuredStorage: "",
-			expectedFull:      0,
+			expectedFull:      false,
 			expectedErr:       nil,
 		},
 		{
 			name:              "Template with configured storage",
 			isTemplate:        true,
 			configuredStorage: "local",
-			expectedFull:      1,
+			expectedFull:      true,
 			expectedErr:       nil,
 		},
 	}
@@ -60,9 +60,10 @@ func TestInstanceGroup_templateCloneOptions(t *testing.T) {
 
 			result, err := ig.getTemplateCloneOptions(&template)
 			require.ErrorIs(t, err, testCase.expectedErr)
+
 			if err == nil {
 				require.Equal(t, testCase.configuredStorage, result.Storage)
-				require.Equal(t, testCase.expectedFull, result.Full)
+				require.Equal(t, testCase.expectedFull, bool(result.Full))
 			}
 		})
 	}

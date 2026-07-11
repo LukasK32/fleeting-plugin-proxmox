@@ -15,12 +15,9 @@ const (
 )
 
 func (ig *InstanceGroup) startRemovedInstanceCollector() {
-	ig.collectorWaitGroup.Add(1)
-
-	go func() {
-		defer ig.collectorWaitGroup.Done()
+	ig.collectorWaitGroup.Go(func() {
 		ig.runRemovedInstanceCollector()
-	}()
+	})
 }
 
 func (ig *InstanceGroup) runRemovedInstanceCollector() {
@@ -67,7 +64,7 @@ func (ig *InstanceGroup) collectRemovedInstances() {
 			continue
 		}
 
-		if member.Name != ig.Settings.InstanceNameRemoving {
+		if member.Name != ig.InstanceNameRemoving {
 			continue
 		}
 
@@ -77,6 +74,7 @@ func (ig *InstanceGroup) collectRemovedInstances() {
 
 		go func(member proxmox.ClusterResource) {
 			defer wg.Done()
+
 			ig.collectInstance(ctx, member)
 		}(member)
 	}
@@ -101,7 +99,7 @@ func (ig *InstanceGroup) collectInstance(ctx context.Context, member proxmox.Clu
 		}
 	}
 
-	task, err := vm.Delete(ctx)
+	task, err := vm.Delete(ctx, nil)
 	if err == nil {
 		err = task.Wait(ctx, proxmoxTaskWaitInterval, collectionTimeout)
 	}

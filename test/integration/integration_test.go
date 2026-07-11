@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lukask32/fleeting-plugin-proxmox/cmd/fleeting-plugin-proxmox/plugin"
+	"github.com/phenix66/fleeting-plugin-proxmox/cmd/fleeting-plugin-proxmox/plugin"
 	"gitlab.com/gitlab-org/fleeting/fleeting/integration"
 	"gitlab.com/gitlab-org/fleeting/fleeting/provider"
 )
@@ -42,7 +42,9 @@ func TestIntegration(t *testing.T) {
 	defer configFile.Close()
 
 	configs := new([]IntegrationTestConfig)
-	if err := json.NewDecoder(configFile).Decode(&configs); err != nil {
+
+	err = json.NewDecoder(configFile).Decode(&configs)
+	if err != nil {
 		t.Errorf("failed to read config file: %v", err)
 	}
 

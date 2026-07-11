@@ -34,11 +34,11 @@ vendor: go.mod go.sum
 
 tools/go-licenses:
 	@$(call INFO,"Installing tool $(shell basename $@)")
-	GOBIN=$$(realpath $$(dirname $@)) go install github.com/google/go-licenses@v1.6.0
+	GOBIN=$$(realpath $$(dirname $@)) go install github.com/google/go-licenses/v2@v2.0.1
 
 tools/golangci-lint:
 	@$(call INFO,"Installing tool $(shell basename $@)")
-	GOBIN=$$(realpath $$(dirname $@)) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	GOBIN=$$(realpath $$(dirname $@)) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
 
 ################################################################################
 # Linters (and checks)

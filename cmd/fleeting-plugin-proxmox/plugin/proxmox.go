@@ -16,9 +16,9 @@ import (
 var ErrNotFound = errors.New("not found")
 
 func (ig *InstanceGroup) getProxmoxPool(ctx context.Context) (*proxmox.Pool, error) {
-	pool, err := ig.proxmox.Pool(ctx, ig.Settings.Pool)
+	pool, err := ig.proxmox.Pool(ctx, ig.Pool)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get pool id='%s': %w", ig.Settings.Pool, err)
+		return nil, fmt.Errorf("failed to get pool id='%s': %w", ig.Pool, err)
 	}
 
 	return pool, nil
@@ -59,9 +59,9 @@ func (ig *InstanceGroup) getProxmoxVMOnNode(ctx context.Context, vmid int, nodeN
 }
 
 func (ig *InstanceGroup) getProxmoxClient() (*proxmox.Client, error) {
-	url, err := url.Parse(ig.Settings.URL)
+	url, err := url.Parse(ig.URL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse URL='%s': %w", ig.Settings.URL, err)
+		return nil, fmt.Errorf("failed to parse URL='%s': %w", ig.URL, err)
 	}
 
 	credentials, err := ig.getProxmoxCredentials()
@@ -73,7 +73,7 @@ func (ig *InstanceGroup) getProxmoxClient() (*proxmox.Client, error) {
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				//nolint:gosec
-				InsecureSkipVerify: ig.Settings.InsecureSkipTLSVerify,
+				InsecureSkipVerify: ig.InsecureSkipTLSVerify,
 			},
 		},
 	}
@@ -86,15 +86,17 @@ func (ig *InstanceGroup) getProxmoxClient() (*proxmox.Client, error) {
 }
 
 func (ig *InstanceGroup) getProxmoxCredentials() (*proxmox.Credentials, error) {
-	credentialsFile, err := os.Open(ig.Settings.CredentialsFilePath)
+	credentialsFile, err := os.Open(ig.CredentialsFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open credentials file from path='%s': %w", ig.Settings.CredentialsFilePath, err)
+		return nil, fmt.Errorf("failed to open credentials file from path='%s': %w", ig.CredentialsFilePath, err)
 	}
 	defer credentialsFile.Close()
 
 	credentials := proxmox.Credentials{}
-	if err := json.NewDecoder(credentialsFile).Decode(&credentials); err != nil {
-		return nil, fmt.Errorf("failed to decode credentials file from path='%s': %w", ig.Settings.CredentialsFilePath, err)
+
+	err = json.NewDecoder(credentialsFile).Decode(&credentials)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode credentials file from path='%s': %w", ig.CredentialsFilePath, err)
 	}
 
 	return &credentials, nil

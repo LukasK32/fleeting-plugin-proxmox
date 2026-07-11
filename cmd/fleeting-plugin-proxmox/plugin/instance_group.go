@@ -2,9 +2,11 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -16,10 +18,21 @@ import (
 
 var _ provider.InstanceGroup = (*InstanceGroup)(nil)
 
-const triggerChannelCapacity = 100
+var (
+	ErrInstanceConnectionTimeout = errors.New("timed out getting connection info")
+	ErrResumeFailed              = errors.New("one or more instances did not resume successfully")
+	ErrSuspendFailed             = errors.New("one or more instances did not suspend successfully")
+)
+
+const (
+	triggerChannelCapacity = 100
+	networkCheckTimeout    = 5 * time.Second
+	networkCheckRetries    = 12
+)
 
 type InstanceGroup struct {
-	Settings         `json:",inline"`
+	Settings `json:",inline"`
+
 	FleetingSettings provider.Settings `json:"-"`
 
 	log     hclog.Logger    `json:"-"`
@@ -48,21 +61,20 @@ type InstanceGroup struct {
 
 // Init implements provider.InstanceGroup.
 func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings provider.Settings) (provider.ProviderInfo, error) {
-	var err error
-
 	ig.log = logger
 	ig.FleetingSettings = settings
 	ig.instanceCollectionTrigger = make(chan struct{}, triggerChannelCapacity)
 	ig.collectorShutdownTrigger = make(chan struct{}, 1)
 	ig.sessionTicketRefresherShutdownTrigger = make(chan struct{}, 1)
 
-	if err := ig.Settings.CheckRequiredFields(); err != nil {
+	err := ig.CheckRequiredFields()
+	if err != nil {
 		return provider.ProviderInfo{}, err
 	}
 
-	ig.Settings.FillWithDefaults()
+	ig.FillWithDefaults()
 
-	if ig.Settings.InsecureSkipTLSVerify {
+	if ig.InsecureSkipTLSVerify {
 		ig.log.Warn("TLS verification for Proxmox client is disabled, connections will be insecure")
 	}
 
@@ -71,7 +83,8 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 		return provider.ProviderInfo{}, err
 	}
 
-	if err := ig.markStaleInstancesForRemoval(ctx); err != nil {
+	err = ig.markStaleInstancesForRemoval(ctx)
+	if err != nil {
 		return provider.ProviderInfo{}, err
 	}
 
@@ -86,14 +99,15 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 	ig.startSessionTicketRefresher()
 
 	return provider.ProviderInfo{
-		ID:      ig.Settings.Pool,
-		MaxSize: *ig.Settings.MaxInstances,
+		ID:      ig.Pool,
+		MaxSize: *ig.MaxInstances,
 	}, nil
 }
 
 // Shutdown implements provider.InstanceGroup.
 func (ig *InstanceGroup) Shutdown(_ context.Context) error {
 	ig.collectorShutdownTrigger <- struct{}{}
+
 	ig.sessionTicketRefresherShutdownTrigger <- struct{}{}
 
 	ig.collectorWaitGroup.Wait()
@@ -104,9 +118,9 @@ func (ig *InstanceGroup) Shutdown(_ context.Context) error {
 
 // Increase implements provider.InstanceGroup.
 func (ig *InstanceGroup) Increase(ctx context.Context, count int) (int, error) {
-	template, err := ig.getProxmoxVM(ctx, *ig.Settings.TemplateID)
+	template, err := ig.getProxmoxVM(ctx, *ig.TemplateID)
 	if err != nil {
-		return 0, fmt.Errorf("failed to find template with id='%d': %w", *ig.Settings.TemplateID, err)
+		return 0, fmt.Errorf("failed to find template with id='%d': %w", *ig.TemplateID, err)
 	}
 
 	var (
@@ -122,7 +136,7 @@ func (ig *InstanceGroup) Increase(ctx context.Context, count int) (int, error) {
 	ig.instanceCloningMu.Lock()
 	defer ig.instanceCloningMu.Unlock()
 
-	for n := 0; n < count; n++ {
+	for range count {
 		errorGroup.Go(func() error {
 			vmid, err := ig.deployInstance(ctx, template, cloneMu)
 			if err != nil {
@@ -138,7 +152,8 @@ func (ig *InstanceGroup) Increase(ctx context.Context, count int) (int, error) {
 		})
 	}
 
-	if err := errorGroup.Wait(); err != nil {
+	err = errorGroup.Wait()
+	if err != nil {
 		return succeeded, fmt.Errorf("failed to create one or more instances: %w", err)
 	}
 
@@ -163,11 +178,11 @@ func (ig *InstanceGroup) Update(ctx context.Context, update func(instance string
 		var state provider.State
 
 		switch member.Name {
-		case ig.Settings.InstanceNameCreating:
+		case ig.InstanceNameCreating:
 			state = provider.StateCreating
-		case ig.Settings.InstanceNameRunning:
+		case ig.InstanceNameRunning:
 			state = provider.StateRunning
-		case ig.Settings.InstanceNameRemoving:
+		case ig.InstanceNameRemoving:
 			state = provider.StateDeleting
 		default:
 			continue // Unknown name, skipping...
@@ -191,22 +206,7 @@ func (ig *InstanceGroup) ConnectInfo(ctx context.Context, instance string) (prov
 		return provider.ConnectInfo{}, fmt.Errorf("failed to retrieve instance vmid='%d': %w", VMID, err)
 	}
 
-	networkInterfaces, err := vm.AgentGetNetworkIFaces(ctx)
-	if err != nil {
-		return provider.ConnectInfo{}, fmt.Errorf("failed to retrieve instance vmid='%d' interfaces: %w", VMID, err)
-	}
-
-	internalAddress, externalAddress, err := determineAddresses(networkInterfaces, ig.InstanceNetworkInterface, ig.InstanceNetworkProtocol)
-	if err != nil {
-		return provider.ConnectInfo{}, err
-	}
-
-	return provider.ConnectInfo{
-		ID:              instance,
-		InternalAddr:    internalAddress,
-		ExternalAddr:    externalAddress,
-		ConnectorConfig: ig.FleetingSettings.ConnectorConfig,
-	}, nil
+	return ig.getConnectInfoFromVM(ctx, instance, vm)
 }
 
 // Decrease implements provider.InstanceGroup.
@@ -224,8 +224,6 @@ func (ig *InstanceGroup) Decrease(ctx context.Context, instancesToRemove []strin
 	)
 
 	for _, member := range pool.Members {
-		member := member
-
 		if !ig.isProxmoxResourceAnInstance(member) {
 			continue
 		}
@@ -234,14 +232,15 @@ func (ig *InstanceGroup) Decrease(ctx context.Context, instancesToRemove []strin
 			continue
 		}
 
-		if member.Name == ig.Settings.InstanceNameCreating {
+		if member.Name == ig.InstanceNameCreating {
 			// It must be running to start the deletion
 			continue
 		}
 
-		if member.Name == ig.Settings.InstanceNameRemoving {
+		if member.Name == ig.InstanceNameRemoving {
 			// Already deleting...
 			succeededMu.Lock()
+
 			succeeded = append(succeeded, strconv.FormatUint(member.VMID, 10))
 			succeededMu.Unlock()
 
@@ -251,12 +250,14 @@ func (ig *InstanceGroup) Decrease(ctx context.Context, instancesToRemove []strin
 		ig.log.Info("removing instance", "vmid", member.VMID)
 
 		errorGroup.Go(func() error {
-			if err := ig.markInstancesForRemoval(ctx, &member); err != nil {
+			err := ig.markInstancesForRemoval(ctx, &member)
+			if err != nil {
 				return err
 			}
 
 			succeededMu.Lock()
 			defer succeededMu.Unlock()
+
 			succeeded = append(succeeded, strconv.FormatUint(member.VMID, 10))
 
 			return nil
@@ -265,4 +266,118 @@ func (ig *InstanceGroup) Decrease(ctx context.Context, instancesToRemove []strin
 
 	//nolint:wrapcheck
 	return succeeded, errorGroup.Wait()
+}
+
+func (ig *InstanceGroup) Heartbeat(ctx context.Context, instance string) error {
+	vmid, err := strconv.Atoi(instance)
+	if err != nil {
+		return fmt.Errorf("invalid vm id '%s': %w", instance, err)
+	}
+
+	vm, err := ig.getProxmoxVM(ctx, vmid)
+	if err != nil {
+		return err
+	}
+
+	// Returns an error if the QEMU agent is not communicating due to an empty result
+	_, err = vm.AgentOsInfo(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to connect to qemu agent '%s': %w", instance, err)
+	}
+
+	return nil
+}
+
+func (ig *InstanceGroup) Resume(ctx context.Context, instances []string) ([]string, error) {
+	var succeeded []string
+
+	var errs []string
+
+	for _, instance := range instances {
+		vmid, err := strconv.Atoi(instance)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("invalid vm id '%s'", instance))
+			continue
+		}
+
+		vm, err := ig.getProxmoxVM(ctx, vmid)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("no vm with id '%d'", vmid))
+			continue
+		}
+
+		_, err = vm.Resume(ctx)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("resume api call failed for vm id '%d'", vmid))
+			continue
+		}
+
+		succeeded = append(succeeded, instance)
+	}
+
+	if len(errs) > 0 {
+		return succeeded, fmt.Errorf("%w: %s", ErrResumeFailed, strings.Join(errs, ", "))
+	}
+
+	return succeeded, nil
+}
+
+func (ig *InstanceGroup) Suspend(ctx context.Context, instances []string) ([]string, error) {
+	var succeeded []string
+
+	var errs []string
+
+	for _, instance := range instances {
+		vmid, err := strconv.Atoi(instance)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("invalid vm id '%s'", instance))
+			continue
+		}
+
+		vm, err := ig.getProxmoxVM(ctx, vmid)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("no vm with id '%d'", vmid))
+			continue
+		}
+
+		_, err = vm.Pause(ctx)
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("pause api call failed for vm id '%d'", vmid))
+			continue
+		}
+
+		succeeded = append(succeeded, instance)
+	}
+
+	if len(errs) > 0 {
+		return succeeded, fmt.Errorf("%w: %s", ErrSuspendFailed, strings.Join(errs, ", "))
+	}
+
+	return succeeded, nil
+}
+
+func (ig *InstanceGroup) getConnectInfoFromVM(ctx context.Context, instance string, vm *proxmox.VirtualMachine) (provider.ConnectInfo, error) {
+	for retry := range networkCheckRetries {
+		networkInterfaces, err := vm.AgentGetNetworkIFaces(ctx)
+		if err != nil {
+			return provider.ConnectInfo{}, fmt.Errorf("failed to retrieve instance vmid='%d' interfaces: %w", vm.VMID, err)
+		}
+
+		internalAddress, externalAddress, err := determineAddresses(networkInterfaces, ig.InstanceNetworkInterface, ig.InstanceNetworkProtocol)
+		if err != nil {
+			ig.log.Error("failed to get network interface", "retry", retry, "vmid", vm.VMID, "err", err)
+			time.Sleep(networkCheckTimeout)
+
+			continue
+		}
+
+		return provider.ConnectInfo{
+			ID:              instance,
+			InternalAddr:    internalAddress,
+			ExternalAddr:    externalAddress,
+			ConnectorConfig: ig.FleetingSettings.ConnectorConfig,
+		}, nil
+	}
+
+	return provider.ConnectInfo{}, fmt.Errorf("%w vmid='%d'", ErrInstanceConnectionTimeout, vm.VMID)
 }
