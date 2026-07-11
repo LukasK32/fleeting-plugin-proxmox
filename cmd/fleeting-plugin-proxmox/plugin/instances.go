@@ -49,6 +49,17 @@ func (ig *InstanceGroup) deployInstance(ctx context.Context, template *proxmox.V
 
 	// Start, configure etc.
 	err = func() error {
+		if ig.Settings.InstanceAutoresizeSize != nil {
+			task, err := vm.ResizeDisk(ctx, *ig.Settings.InstanceAutoresizeDisk, *ig.Settings.InstanceAutoresizeSize)
+			if err == nil {
+				err = task.Wait(ctx, proxmoxTaskWaitInterval, proxmoxTaskWaitTimeout)
+			}
+
+			if err != nil {
+				return fmt.Errorf("failed to resize disk: %w", err)
+			}
+		}
+
 		// Start the VM
 		task, err := vm.Start(ctx)
 		if err == nil {

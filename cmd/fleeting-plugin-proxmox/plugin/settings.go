@@ -80,6 +80,12 @@ type Settings struct {
 
 	// Tags to set for instances during removal, semicolon delimited.
 	InstanceTagsRemoving string `json:"instance_tags_removing"`
+
+	// Disk to increase after cloning.
+	InstanceAutoresizeDisk *string `json:"instance_autoresize_disk"`
+
+	// Increase disk to this size after cloning.
+	InstanceAutoresizeSize *string `json:"instance_autoresize_size"`
 }
 
 func (s *Settings) FillWithDefaults() {
@@ -131,6 +137,51 @@ func (s *Settings) CheckRequiredFields() error {
 
 	if s.InstanceNetworkProtocol != "" && s.InstanceNetworkProtocol != NetworkProtocolIPv4 && s.InstanceNetworkProtocol != NetworkProtocolIPv6 && s.InstanceNetworkProtocol != NetworkProtocolAny {
 		return fmt.Errorf("%w: instance_network_protocol: must be ipv4, ipv6 or any", ErrSettingInvalidParameter)
+	}
+
+	if s.InstanceAutoresizeDisk != nil && s.InstanceAutoresizeSize == nil {
+		return fmt.Errorf("%w: instance_autoresize_size must have a value when instance_autoresize_disk is set", ErrSettingInvalidParameter)
+	}
+
+	if s.InstanceAutoresizeDisk == nil && s.InstanceAutoresizeSize != nil {
+		return fmt.Errorf("%w: instance_autoresize_disk must have a value when instance_autoresize_size is set", ErrSettingInvalidParameter)
+	}
+
+	if s.InstanceAutoresizeDisk != nil {
+		diskRE := regexp.MustCompile(`^(ide|scsi|sata)(\d+)$`)
+		matches := diskRE.FindStringSubmatch(*s.InstanceAutoresizeDisk)
+		if matches == nil {
+			return fmt.Errorf("%w: instance_autoresize_disk: disk is not valid", ErrSettingInvalidParameter)
+		}
+		maxI := 0
+		switch matches[1] {
+		case "ide":
+			maxI = 4
+		case "scsi":
+			maxI = 30
+		case "sata":
+			maxI = 5
+		}
+
+		i, convErr := strconv.Atoi(matches[2])
+		if convErr != nil {
+			return fmt.Errorf("invalid integer for i=%q: %w", matches[2], convErr)
+		}
+
+		if i > maxI {
+			return fmt.Errorf("%w: instance_autoresize_disk: disk type is valid, but index %s is not possible", ErrSettingInvalidParameter, matches[2])
+		}
+
+	}
+
+	if s.InstanceAutoresizeSize != nil {
+		matched, err := regexp.MatchString(`^\+?\d+(\.\d+)?[KMGT]?$`, *s.InstanceAutoresizeSize)
+		if err != nil {
+			return fmt.Errorf("Unable to compile regex: %w", err)
+		}
+		if !matched {
+			return fmt.Errorf("%w: instance_autoresize_size: must be a valid abolute size, or a size increment (e.g.: +10G or 512M)", ErrSettingInvalidParameter)
+		}
 	}
 
 	return nil
