@@ -27,6 +27,22 @@ See [Releases](https://github.com/LukasK32/fleeting-plugin-proxmox/releases) for
 
 ### Credentials file
 
+The credentials file selects one of two mutually exclusive authentication
+methods.
+
+**API token (recommended).** Tokens can be scoped to the plugin's pool,
+don't expire, and need no session refresh, so no privileged password is
+held in memory or on disk. Create one under the dedicated user (see
+[Proxmox configuration](#proxmox-configuration)) with privilege separation
+enabled, and grant it the same roles as the user.
+
+| Parameter      | Type   | Description                                           |
+| -------------- | ------ | ----------------------------------------------------- |
+| `token_id`     | string | Full token identifier, in `user@realm!tokenname` form |
+| `token_secret` | string | The token's secret value                              |
+
+**Username/password (legacy).** Drives an hourly session-ticket refresh.
+
 <!-- TODO: Document `path` and `privs`  -->
 | Parameter  | Type   | Description               |
 | ---------- | ------ | ------------------------- |
@@ -34,6 +50,8 @@ See [Releases](https://github.com/LukasK32/fleeting-plugin-proxmox/releases) for
 | `username` | string | User name                 |
 | `password` | string | User password             |
 | `otp`      | string | One-time password for 2FA |
+
+`credentials.example.json` shows the API-token form. For username/password authentication, replace its contents with the legacy fields listed above.
 
 ### Template VM configuration
 
@@ -55,6 +73,11 @@ After creating a **DEDICATED** user, pool and storage follow procedure below to 
     * `PVESDNAdmin`.
 5. Add following role for the user to the node with the storage, network, template etc.:
     * `PVEAuditor` without propagation.
+
+If you are using **API token authentication** (recommended), also perform the following:
+
+1. Create an API token for the dedicated user (*Datacenter → Permissions → API Tokens → Add*). Leave **Privilege Separation** enabled so the token only ever has the permissions you grant it explicitly.
+2. Grant the token the same roles on the same paths as in steps 3–5 above. A privilege-separated token starts with no permissions of its own, so it needs its own role assignments in addition to the user's. (Alternatively, disable Privilege Separation when creating the token so it inherits the user's permissions — less isolated, but no separate role assignments are needed.)
 
 ## Development
 

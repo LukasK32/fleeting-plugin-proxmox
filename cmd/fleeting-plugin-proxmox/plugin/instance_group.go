@@ -44,6 +44,10 @@ type InstanceGroup struct {
 
 	// Wait group for session ticket refresher.
 	sessionTicketRefresherWaitGroup sync.WaitGroup `json:"-"`
+
+	// Whether the session ticket refresher was started. It is only needed
+	// for username/password authentication; API tokens don't expire.
+	sessionTicketRefresherStarted bool `json:"-"`
 }
 
 // Init implements provider.InstanceGroup.
@@ -66,7 +70,12 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 		ig.log.Warn("TLS verification for Proxmox client is disabled, connections will be insecure")
 	}
 
-	ig.proxmox, err = ig.getProxmoxClient()
+	credentials, err := ig.getProxmoxCredentials()
+	if err != nil {
+		return provider.ProviderInfo{}, err
+	}
+
+	ig.proxmox, err = ig.getProxmoxClient(credentials)
 	if err != nil {
 		return provider.ProviderInfo{}, err
 	}
@@ -82,8 +91,14 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 	//nolint:contextcheck
 	ig.startRemovedInstanceCollector()
 
-	//nolint:contextcheck
-	ig.startSessionTicketRefresher()
+	// The refresher is only started for authentication methods whose session
+	// ticket expires (username/password); API tokens don't need it.
+	if credentials.needsSessionTicketRefresher() {
+		ig.sessionTicketRefresherStarted = true
+
+		//nolint:contextcheck
+		ig.startSessionTicketRefresher()
+	}
 
 	return provider.ProviderInfo{
 		ID:      ig.Settings.Pool,
@@ -94,10 +109,12 @@ func (ig *InstanceGroup) Init(ctx context.Context, logger hclog.Logger, settings
 // Shutdown implements provider.InstanceGroup.
 func (ig *InstanceGroup) Shutdown(_ context.Context) error {
 	ig.collectorShutdownTrigger <- struct{}{}
-	ig.sessionTicketRefresherShutdownTrigger <- struct{}{}
-
 	ig.collectorWaitGroup.Wait()
-	ig.sessionTicketRefresherWaitGroup.Wait()
+
+	if ig.sessionTicketRefresherStarted {
+		ig.sessionTicketRefresherShutdownTrigger <- struct{}{}
+		ig.sessionTicketRefresherWaitGroup.Wait()
+	}
 
 	return nil
 }
