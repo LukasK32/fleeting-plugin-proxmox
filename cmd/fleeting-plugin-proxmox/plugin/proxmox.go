@@ -13,7 +13,91 @@ import (
 	"github.com/luthermonson/go-proxmox"
 )
 
-var ErrNotFound = errors.New("not found")
+var (
+	ErrNotFound = errors.New("not found")
+
+	// Credentials file validation errors.
+	ErrNoCredentials        = errors.New("credentials file specifies neither an API token nor a username/password")
+	ErrIncompleteAPIToken   = errors.New("API token authentication requires both token_id and token_secret")
+	ErrIncompletePassword   = errors.New("password authentication requires both username and password")
+	ErrAmbiguousCredentials = errors.New("credentials file specifies both an API token and a username/password; use one or the other")
+)
+
+// proxmoxCredentials is the on-disk credentials file. It supports two
+// mutually exclusive authentication methods:
+//
+//   - An API token (preferred). Tokens can be scoped to the plugin's pool,
+//     don't expire, and need no session refresh — so no privileged
+//     password sits in the runner-manager's memory or on disk.
+//   - A username/password login (legacy). Retained for backwards
+//     compatibility; it drives the hourly session-ticket refresher.
+type proxmoxCredentials struct {
+	// API token authentication. TokenID is the full token identifier in
+	// user@realm!tokenname form; TokenSecret is the token's secret value.
+	TokenID     string `json:"token_id"`
+	TokenSecret string `json:"token_secret"`
+
+	// Username/password authentication.
+	Realm    string `json:"realm"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Otp      string `json:"otp,omitempty"`
+}
+
+// usesAPIToken reports whether the file selects API token authentication.
+func (c *proxmoxCredentials) usesAPIToken() bool {
+	return c.TokenID != "" || c.TokenSecret != ""
+}
+
+// needsSessionTicketRefresher reports whether this authentication method
+// relies on a session ticket that must be periodically refreshed. Session
+// tickets expire, so username/password authentication needs the refresher;
+// API tokens don't expire, so they don't.
+func (c *proxmoxCredentials) needsSessionTicketRefresher() bool {
+	return !c.usesAPIToken()
+}
+
+func (c *proxmoxCredentials) validate() error {
+	usesPassword := c.Username != "" || c.Password != ""
+
+	switch {
+	case c.usesAPIToken() && usesPassword:
+		return ErrAmbiguousCredentials
+	case c.usesAPIToken():
+		if c.TokenID == "" || c.TokenSecret == "" {
+			return ErrIncompleteAPIToken
+		}
+	case usesPassword:
+		if c.Username == "" || c.Password == "" {
+			return ErrIncompletePassword
+		}
+	default:
+		return ErrNoCredentials
+	}
+
+	return nil
+}
+
+// authOption returns the go-proxmox client option implementing the
+// selected authentication method.
+func (c *proxmoxCredentials) authOption() proxmox.Option {
+	if c.usesAPIToken() {
+		return proxmox.WithAPIToken(c.TokenID, c.TokenSecret)
+	}
+
+	return proxmox.WithCredentials(c.toProxmoxCredentials())
+}
+
+// toProxmoxCredentials maps the username/password fields onto the library's
+// credentials type, used for session-ticket login and refresh.
+func (c *proxmoxCredentials) toProxmoxCredentials() *proxmox.Credentials {
+	return &proxmox.Credentials{
+		Username: c.Username,
+		Password: c.Password,
+		Otp:      c.Otp,
+		Realm:    c.Realm,
+	}
+}
 
 func (ig *InstanceGroup) getProxmoxPool(ctx context.Context) (*proxmox.Pool, error) {
 	pool, err := ig.proxmox.Pool(ctx, ig.Settings.Pool)
@@ -58,15 +142,10 @@ func (ig *InstanceGroup) getProxmoxVMOnNode(ctx context.Context, vmid int, nodeN
 	return vm, nil
 }
 
-func (ig *InstanceGroup) getProxmoxClient() (*proxmox.Client, error) {
+func (ig *InstanceGroup) getProxmoxClient(credentials *proxmoxCredentials) (*proxmox.Client, error) {
 	url, err := url.Parse(ig.Settings.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse URL='%s': %w", ig.Settings.URL, err)
-	}
-
-	credentials, err := ig.getProxmoxCredentials()
-	if err != nil {
-		return nil, err
 	}
 
 	httpClient := http.Client{
@@ -80,21 +159,25 @@ func (ig *InstanceGroup) getProxmoxClient() (*proxmox.Client, error) {
 
 	return proxmox.NewClient(
 		url.JoinPath("/api2/json").String(),
-		proxmox.WithCredentials(credentials),
+		credentials.authOption(),
 		proxmox.WithHTTPClient(&httpClient),
 	), nil
 }
 
-func (ig *InstanceGroup) getProxmoxCredentials() (*proxmox.Credentials, error) {
+func (ig *InstanceGroup) getProxmoxCredentials() (*proxmoxCredentials, error) {
 	credentialsFile, err := os.Open(ig.Settings.CredentialsFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open credentials file from path='%s': %w", ig.Settings.CredentialsFilePath, err)
 	}
 	defer credentialsFile.Close()
 
-	credentials := proxmox.Credentials{}
+	credentials := proxmoxCredentials{}
 	if err := json.NewDecoder(credentialsFile).Decode(&credentials); err != nil {
 		return nil, fmt.Errorf("failed to decode credentials file from path='%s': %w", ig.Settings.CredentialsFilePath, err)
+	}
+
+	if err := credentials.validate(); err != nil {
+		return nil, fmt.Errorf("invalid credentials file at path='%s': %w", ig.Settings.CredentialsFilePath, err)
 	}
 
 	return &credentials, nil
