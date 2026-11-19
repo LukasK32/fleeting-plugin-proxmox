@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -18,6 +19,7 @@ var (
 	sampleInstanceNameCreating = "proxmox-creating"
 	sampleInstanceNameRunning  = "running-prox"
 	sampleInstanceNameRemoving = "proxve-removing"
+	sampleTaskTimeout          = "10m"
 )
 
 func TestSettings_fillWithDefaults(t *testing.T) {
@@ -31,17 +33,40 @@ func TestSettings_fillWithDefaults(t *testing.T) {
 	require.Equal(t, "fleeting-removing", settings.InstanceNameRemoving)
 	require.Equal(t, "ens18", settings.InstanceNetworkInterface)
 	require.Equal(t, "ipv4", settings.InstanceNetworkProtocol)
+	require.Equal(t, "5m", settings.TaskTimeout)
 
 	settings2 := Settings{
 		InstanceNameCreating: sampleInstanceNameCreating,
 		InstanceNameRunning:  sampleInstanceNameRunning,
 		InstanceNameRemoving: sampleInstanceNameRemoving,
+		TaskTimeout:          sampleTaskTimeout,
 	}
 	settings2.FillWithDefaults()
 
 	require.Equal(t, sampleInstanceNameCreating, settings2.InstanceNameCreating)
 	require.Equal(t, sampleInstanceNameRunning, settings2.InstanceNameRunning)
 	require.Equal(t, sampleInstanceNameRemoving, settings2.InstanceNameRemoving)
+	require.Equal(t, sampleTaskTimeout, settings2.TaskTimeout)
+}
+
+func TestSettings_getTaskTimeout(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    string
+		expected time.Duration
+	}{
+		{name: "Default", value: "", expected: 5 * time.Minute},
+		{name: "Minutes", value: "10m", expected: 10 * time.Minute},
+		{name: "Mixed units", value: "1h30m", expected: 90 * time.Minute},
+		{name: "Invalid falls back to default", value: "ten minutes", expected: 5 * time.Minute},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			settings := Settings{TaskTimeout: tt.value}
+			require.Equal(t, tt.expected, settings.GetTaskTimeout())
+		})
+	}
 }
 
 func TestSettings_checkRequiredFields(t *testing.T) {
@@ -129,6 +154,45 @@ func TestSettings_checkRequiredFields(t *testing.T) {
 				MaxInstances:        &sampleMaxInstances,
 			},
 			expectedError: nil,
+		},
+		{
+			name: "Valid task timeout",
+			settings: Settings{
+				URL:                 sampleURL,
+				CredentialsFilePath: sampleCredentialsPath,
+				Pool:                samplePool,
+				Storage:             sampleStorage,
+				TemplateID:          &sampleTemplateID,
+				MaxInstances:        &sampleMaxInstances,
+				TaskTimeout:         sampleTaskTimeout,
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Invalid task timeout",
+			settings: Settings{
+				URL:                 sampleURL,
+				CredentialsFilePath: sampleCredentialsPath,
+				Pool:                samplePool,
+				Storage:             sampleStorage,
+				TemplateID:          &sampleTemplateID,
+				MaxInstances:        &sampleMaxInstances,
+				TaskTimeout:         "10",
+			},
+			expectedError: ErrSettingInvalidParameter,
+		},
+		{
+			name: "Non-positive task timeout",
+			settings: Settings{
+				URL:                 sampleURL,
+				CredentialsFilePath: sampleCredentialsPath,
+				Pool:                samplePool,
+				Storage:             sampleStorage,
+				TemplateID:          &sampleTemplateID,
+				MaxInstances:        &sampleMaxInstances,
+				TaskTimeout:         "0s",
+			},
+			expectedError: ErrSettingInvalidParameter,
 		},
 		{
 			name: "Invalid protocol",
