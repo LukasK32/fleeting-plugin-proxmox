@@ -24,6 +24,7 @@ See [Releases](https://github.com/LukasK32/fleeting-plugin-proxmox/releases) for
 | `instance_name_creating`     | string                    | `fleeting-creating`                | Name to set for instances during creation.                                                   |
 | `instance_name_running`      | string                    | `fleeting-running`                 | Name to set for running instances.                                                           |
 | `instance_name_removing`     | string                    | `fleeting-removing`                | Name to set for instances during removal.                                                    |
+| `task_timeout`               | string                    | `5m`                               | Maximum time to wait for each Proxmox VE task (clone, start, rename), as a Go duration.      |
 
 ### Credentials file
 
